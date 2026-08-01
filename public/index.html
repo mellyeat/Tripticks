@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="TripTicks - Reserva experiencias de viaje curadas para viajeros exigentes." />
+  <title>TripTicks - Descubre tu proxima aventura</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@600;700&display=swap" />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" />
+
+  <link rel="stylesheet" href="css/output.css" />
+</head>
+
+<body class="bg-off-white text-on-background font-body-md text-body-md antialiased overflow-x-hidden">
+  <header id="main-nav"
+          class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md shadow-sm transition-all duration-300">
+    <div class="shell flex justify-between items-center py-4">
+
+      <a href="index.html"
+         class="font-display-lg text-display-lg-mobile md:text-display-lg text-deep-teal tracking-tight hover:scale-105 transition-transform duration-200">
+        TripTicks
+      </a>
+
+      <nav class="hidden md:flex items-center gap-gutter" aria-label="Navegacion principal">
+        <a href="index.html" class="nav-link-active" aria-current="page">Inicio</a>
+        <a href="pages/trips.html" class="nav-link">Viajes</a>
+        <a href="pages/reservations.html" class="nav-link hidden" data-auth="user">Mis Reservaciones</a>
+        <a href="pages/admin/dashboard.html" class="nav-link hidden" data-auth="admin">Administracion</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <!-- Visitante -->
+        <div class="flex items-center gap-2" data-auth="guest">
+          <a href="pages/login.html" class="btn-ghost hidden md:inline-flex">Iniciar sesion</a>
+          <a href="pages/register.html" class="btn-primary">Registro</a>
+        </div>
+
+        <div class="hidden items-center gap-3" data-auth="user">
+          <span class="hidden md:block font-body-sm text-body-sm text-on-surface-variant"
+                data-user="nombre"></span>
+          <button type="button" id="logout-btn" class="btn-ghost">
+            <span class="material-symbols-outlined text-lg" aria-hidden="true">logout</span>
+            Salir
+          </button>
+        </div>
+
+        <button type="button" id="mobile-menu-btn"
+                class="md:hidden p-2 text-on-surface-variant rounded-lg hover:bg-surface-container-high"
+                aria-label="Abrir menu" aria-expanded="false" aria-controls="mobile-menu">
+          <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+        </button>
+      </div>
+    </div>
+
+    <nav id="mobile-menu" class="hidden md:hidden border-t border-outline-variant/40 bg-surface"
+         aria-label="Navegacion movil">
+      <div class="shell flex flex-col py-4 gap-1">
+        <a href="index.html" class="py-3 nav-link-active border-b-0">Inicio</a>
+        <a href="pages/trips.html" class="py-3 nav-link">Viajes</a>
+        <a href="pages/reservations.html" class="py-3 nav-link hidden" data-auth="user">Mis Reservaciones</a>
+        <a href="pages/admin/dashboard.html" class="py-3 nav-link hidden" data-auth="admin">Administracion</a>
+        <a href="pages/login.html" class="py-3 nav-link" data-auth="guest">Iniciar sesion</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="pt-24 md:pt-32 pb-24">
+    <section class="shell animate-fade-up">
+      <div class="relative w-full h-[600px] rounded-xl overflow-hidden shadow-2xl">
+        <div class="absolute inset-0 bg-cover bg-center"
+             style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDEQ474PA4SXUWaLW4qtXmL8PGgBFLmexoVYLJKIApcmT1j2oG-A8r_mlOtbSh3wfIYQLeytKzmIaXRk_UWHFeWYrErZKMe1ByVl5huX9yc67FRkG0aLMRSNen0QjVxcGu1TyUt8skuRrURsR1NM_HmyCJKeUU6h9GtyhMJEn2KXGN72ZyVZauukGzQ-Ruxgwyz0DDWa7zDqttwd33xNKv66KxuI1XiXbu146X2WcO8LF358jYJ3ymLPQ')"
+             role="img"
+             aria-label="Vista aerea de una costa de aguas turquesa al atardecer"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/30 to-transparent"></div>
+
+        <div class="absolute inset-0 flex flex-col justify-end p-8 md:p-16">
+          <h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-white max-w-2xl mb-6 drop-shadow-md">
+            Descubre tu proxima aventura sofisticada.
+          </h1>
+          <p class="font-body-lg text-body-lg text-off-white/90 max-w-xl mb-12">
+            Experiencias curadas para viajeros exigentes. Encuentra destinos exclusivos
+            y retiros disenados solo para ti.
+          </p>
+
+          <form action="pages/trips.html" method="get"
+                class="bg-off-white p-6 rounded-xl shadow-[0_20px_40px_-12px_rgba(15,76,92,0.2)] w-full max-w-4xl mx-auto md:mx-0 translate-y-16 md:translate-y-8 relative z-10 border border-surface-variant">
+            <div class="flex flex-col md:flex-row gap-4 items-end">
+
+              <div class="w-full md:flex-1">
+                <label for="hero-destino" class="field-label">Destino</label>
+                <div class="relative">
+                  <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray text-xl"
+                        aria-hidden="true">location_on</span>
+                  <input type="text" id="hero-destino" name="destino" placeholder="A donde vas?"
+                         class="field field-icon" autocomplete="off" />
+                </div>
+              </div>
+
+              <div class="w-full md:flex-1">
+                <label for="hero-salida" class="field-label">Fecha de salida</label>
+                <div class="relative">
+                  <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray text-xl"
+                        aria-hidden="true">calendar_month</span>
+                  <input type="date" id="hero-salida" name="salida" class="field field-icon" />
+                </div>
+              </div>
+
+              <div class="w-full md:flex-1">
+                <label for="hero-regreso" class="field-label">Fecha de regreso</label>
+                <div class="relative">
+                  <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray text-xl"
+                        aria-hidden="true">event_available</span>
+                  <input type="date" id="hero-regreso" name="regreso" class="field field-icon" />
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary w-full md:w-auto px-8 shrink-0">
+                <span class="material-symbols-outlined text-lg" aria-hidden="true">search</span>
+                Buscar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+    <section class="shell mt-40 md:mt-32 animate-fade-up delay-100">
+      <div class="mb-12 flex flex-col md:flex-row justify-between items-end gap-4">
+        <div>
+          <h2 class="font-headline-md text-headline-md text-primary mb-2">Destinos Destacados</h2>
+          <p class="font-body-md text-body-md text-on-surface-variant">
+            Selecciones curadas para tu proximo escape.
+          </p>
+        </div>
+        <a href="pages/trips.html"
+           class="text-deep-teal font-label-caps text-label-caps flex items-center gap-1 hover:text-primary transition-colors group">
+          Ver todos
+          <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform"
+                aria-hidden="true">arrow_forward</span>
+        </a>
+      </div>
+
+      <div id="featured-trips" class="grid grid-cols-1 md:grid-cols-12 gap-gutter auto-rows-[300px]">
+
+        <a href="pages/trip-detail.html?id=1"
+           class="premium-card group relative md:col-span-8 md:row-span-2 rounded-xl overflow-hidden shadow-sm block">
+          <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+               style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA43cOA65SemhuXnctQnMUa4h9uxiFllop8tzh2bQUXRqWHDRk0Ccz8gIz_W7EAFlgaD6OuqWEfy0-YamWqe5JX3z8NcHYnxzKY3SXEIKSnGhoAT-TpUgcWzQ9QV152cWgPQGV-Z7-8fzxt5Ix998PHEsEGUyCH0Pq0DSgnlQEGVJr7_pFpkqPZOUA70oWWKAIde3o09LIUrk-erWL9YJaNIeG2XfmWpSFMRSTuT-OPxy3G7oK6_dU6xw')"
+               role="img" aria-label="Villa privada rodeada de vegetacion tropical"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+
+          <div class="absolute bottom-0 left-0 p-8 w-full">
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="chip">Bali, Indonesia</span>
+              <span class="chip-glass">
+                <span class="material-symbols-outlined text-[14px]" aria-hidden="true">event_seat</span>
+                8 cupos
+              </span>
+            </div>
+            <h3 class="font-headline-sm text-headline-sm text-white mb-2">Retiro Balines Privado</h3>
+            <p class="font-body-sm text-body-sm text-off-white/80 line-clamp-2 max-w-md mb-3">
+              Experimenta la maxima tranquilidad en una villa rodeada de naturaleza
+              exuberante, disenada para la desconexion total.
+            </p>
+            <div class="flex items-center gap-4 text-off-white/90">
+              <span class="font-headline-sm text-headline-sm text-white">$2,450</span>
+              <span class="font-body-sm text-body-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">calendar_month</span>
+                12 - 19 Oct 2026
+              </span>
+            </div>
+          </div>
+        </a>
+
+        <a href="pages/trip-detail.html?id=2"
+           class="premium-card group relative md:col-span-4 md:row-span-1 rounded-xl overflow-hidden shadow-sm block">
+          <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+               style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBK6Rc7wXts3P3f9epYdmBd7-TxiIc6MNS7EOPulTA9ulqZ3VOMJoxtqGD_5UH5jfj3AN3ZHwyoa4ZH6tjtdnwm6hKnXsItv-oNLIkB6UnIx9h3I0Sc9PsEgW4t_zNnjMVUAiqO7Oy88HLVhAmdkKOZm90ccxCVQ5l9DUD1-ynVeiZDGNCz82XOgl29QU231KB52f6uzPiJdU3snAQqUCbrhL7YYTx8bRuxPdg_CcdZoLSdjSxAkoat9w')"
+               role="img" aria-label="Terraza urbana con vista al horizonte de la ciudad"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+
+          <div class="absolute bottom-0 left-0 p-6 w-full">
+            <span class="chip mb-2">Nueva York, EUA</span>
+            <h3 class="font-body-lg text-body-lg font-semibold text-white">Escapada Metropolitana</h3>
+            <div class="flex items-center justify-between mt-1">
+              <span class="font-body-lg text-body-lg font-semibold text-white">$1,890</span>
+              <span class="font-body-sm text-body-sm text-off-white/80">5 cupos</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Tarjeta mediana -->
+        <a href="pages/trip-detail.html?id=3"
+           class="premium-card group relative md:col-span-4 md:row-span-1 rounded-xl overflow-hidden shadow-sm block">
+          <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+               style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD9VJ-zHWo7cQNLGALw5eK-XkvzCabXU51o8Hxn8O8v__nteOizfG2I-KQ5L9J1qzuqo8PZCE9e1RyIPsvReII37triQGX0yhOR2iHbFG8jA-CyTke8aD91cwXUtJBekd2iiS0Xuwg3Kt9AYCVEXQbBmrE3MuEGqHbP8i7sGDtMvWO8uRTPLAwYr4AWhmkDqORuf3h2203RcZfDhTkgHqLdZq9scF4231IfkNgMfRJUcZvVZtzg5PQoNQ')"
+               role="img" aria-label="Alojamiento minimalista en el desierto al atardecer"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+
+          <div class="absolute bottom-0 left-0 p-6 w-full">
+            <span class="chip mb-2">Merzouga, Marruecos</span>
+            <h3 class="font-body-lg text-body-lg font-semibold text-white">Oasis del Desierto</h3>
+            <div class="flex items-center justify-between mt-1">
+              <span class="font-body-lg text-body-lg font-semibold text-white">$1,340</span>
+              <span class="font-body-sm text-body-sm text-off-white/80">12 cupos</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+    <section class="shell mt-24 md:mt-32 animate-fade-up delay-200">
+      <div class="bg-surface-container-low rounded-xl p-8 md:p-12 relative overflow-hidden border border-outline-variant/30">
+        <div class="absolute -right-24 -top-24 w-96 h-96 bg-inverse-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-12">
+          <div class="w-full md:w-1/3">
+            <span class="text-soft-terracota font-label-caps text-label-caps block mb-2">CUPOS LIMITADOS</span>
+            <h2 class="font-headline-md text-headline-md text-primary mb-4">Proximas Salidas</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-8">
+              Viajes con fecha de salida cercana. Los lugares se asignan por orden
+              de reservacion, asi que conviene apartar el tuyo pronto.
+            </p>
+            <a href="pages/trips.html" class="btn-secondary">Ver todo el catalogo</a>
+          </div>
+
+          <div id="upcoming-trips" class="w-full md:w-2/3 flex flex-col sm:flex-row gap-gutter">
+
+            <article class="premium-card group bg-off-white rounded-lg p-4 shadow-sm border border-surface-variant flex-1 flex flex-col">
+              <div class="w-full h-40 rounded-md overflow-hidden mb-4 relative">
+                <div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
+                     style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA8CwPzhlXyK6Vu4OZLzhQpHee3BKRBSvlBMW9zKfktxNccK7aerg0jUVz4DrSz49stx6Iw53pU7aCLTaqzd0nwdVdDpArYvwjONgTbAnI2-qrAtb5FAyN3twkDjdzxpIB79EX1BtbwcdwwFK3BXEEqcD75_arqaUDvtsBcdv_bnjw0hGwHAmgVrGqvu3ySIwN7vu_VWW6UvJoYZpUq-uSS3_0Ibn3QHS6AyA0635Zr9QvQK_NOKQgVsg')"
+                     role="img" aria-label="Costa Amalfitana con casas sobre el acantilado"></div>
+              </div>
+              <div class="flex justify-between items-start mb-2 gap-2">
+                <h3 class="font-body-lg text-body-lg font-semibold text-primary">Costa Amalfitana</h3>
+                <span class="chip-alert shrink-0">3 cupos</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-warm-gray mb-4 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">calendar_month</span>
+                12 - 19 Oct 2026
+              </p>
+              <div class="flex items-center justify-between mt-auto pt-3 border-t border-outline-variant/30">
+                <span class="font-headline-sm text-headline-sm text-deep-teal">$2,450</span>
+                <a href="pages/trip-detail.html?id=4"
+                   class="font-label-caps text-label-caps text-deep-teal hover:text-primary flex items-center gap-1">
+                  Ver detalle
+                  <span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
+                </a>
+              </div>
+            </article>
+
+            <article class="premium-card group bg-off-white rounded-lg p-4 shadow-sm border border-surface-variant flex-1 flex flex-col">
+              <div class="w-full h-40 rounded-md overflow-hidden mb-4 relative">
+                <div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
+                     style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA-mLm6n5trAOzopSzDIm7doEt7YaV42-Njacbcvlde0F1WMK2dwmbHNiJxdtxsHdwXlrzmtxF_loXjwvHbvgru1fS0DTrN_ckd7r28AtV9VIMXT9at56wzx3nAmK4GDbf-M4C4fNY2LOekKUVemAtgEKxy-QlEjYk6YYFyKvhbOBzatA2LG5g2rUJzzZap2_IJFbGQ7yNrxAyCirsXRT01jbq0W-mOzdyW5HNJmf0cR6e85v4sbz33rg')"
+                     role="img" aria-label="Bungalow sobre el agua en Maldivas al atardecer"></div>
+              </div>
+              <div class="flex justify-between items-start mb-2 gap-2">
+                <h3 class="font-body-lg text-body-lg font-semibold text-primary">Maldivas Premium</h3>
+                <span class="chip shrink-0">9 cupos</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-warm-gray mb-4 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">calendar_month</span>
+                03 - 08 Nov 2026
+              </p>
+              <div class="flex items-center justify-between mt-auto pt-3 border-t border-outline-variant/30">
+                <span class="font-headline-sm text-headline-sm text-deep-teal">$4,200</span>
+                <a href="pages/trip-detail.html?id=5"
+                   class="font-label-caps text-label-caps text-deep-teal hover:text-primary flex items-center gap-1">
+                  Ver detalle
+                  <span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
+                </a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================================================================== -->
+  <footer class="w-full py-12 bg-tertiary-container">
+    <div class="shell grid grid-cols-1 md:grid-cols-4 gap-gutter">
+      <div class="col-span-1 md:col-span-2 space-y-4">
+        <span class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-tertiary-container block">
+          TripTicks
+        </span>
+        <p class="font-body-sm text-body-sm text-on-tertiary-container/80 max-w-sm">
+          Curando experiencias excepcionales para el viajero moderno.
+          Sofisticacion, aventura y servicio impecable en cada destino.
+        </p>
+      </div>
+
+      <div class="col-span-1">
+        <h2 class="font-label-caps text-label-caps text-secondary-container mb-4">EXPLORAR</h2>
+        <ul class="space-y-3">
+          <li><a href="pages/trips.html" class="footer-link">Viajes</a></li>
+          <li><a href="pages/reservations.html" class="footer-link">Mis reservaciones</a></li>
+          <li><a href="pages/login.html" class="footer-link">Iniciar sesion</a></li>
+          <li><a href="pages/register.html" class="footer-link">Crear cuenta</a></li>
+        </ul>
+      </div>
+
+      <div class="col-span-1">
+        <h2 class="font-label-caps text-label-caps text-secondary-container mb-4">CONTACTO</h2>
+        <div class="flex gap-4">
+          <a href="mailto:contacto@tripticks.com" aria-label="Escribenos por correo"
+             class="w-10 h-10 rounded-full bg-on-tertiary-container/10 flex items-center justify-center text-on-tertiary-container hover:bg-on-tertiary-container/20 transition-colors">
+            <span class="material-symbols-outlined text-sm" aria-hidden="true">mail</span>
+          </a>
+          <a href="#" aria-label="Comparte TripTicks"
+             class="w-10 h-10 rounded-full bg-on-tertiary-container/10 flex items-center justify-center text-on-tertiary-container hover:bg-on-tertiary-container/20 transition-colors">
+            <span class="material-symbols-outlined text-sm" aria-hidden="true">share</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-span-1 md:col-span-4 mt-8 pt-8 border-t border-on-tertiary-container/10 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="font-body-sm text-body-sm text-on-tertiary-container/60">
+          &copy; 2026 TripTicks. Sistema de reservacion de viajes.
+        </p>
+        <div class="flex items-center gap-2 text-on-tertiary-container/60">
+          <span class="material-symbols-outlined text-sm" aria-hidden="true">public</span>
+          <span class="font-body-sm text-body-sm">Global (ES)</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/trips.js"></script>
+</body>
+</html>
