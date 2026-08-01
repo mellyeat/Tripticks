@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Catalogo de viajes disponibles en TripTicks: busca, filtra y reserva." />
+  <title>Viajes - TripTicks</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@600;700&display=swap" />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" />
+
+  <link rel="stylesheet" href="../css/output.css" />
+</head>
+
+<body class="bg-off-white text-on-background font-body-md text-body-md antialiased min-h-screen flex flex-col">
+
+  <!-- ==================================================================
+       Barra de navegacion con buscador global (RF-05, RF-17)
+       ================================================================== -->
+  <header class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md shadow-sm">
+    <div class="shell flex justify-between items-center py-4 gap-4">
+
+      <a href="../index.html"
+         class="font-display-lg text-display-lg-mobile text-deep-teal tracking-tight shrink-0 hover:scale-105 transition-transform duration-200">
+        TripTicks
+      </a>
+
+      <!-- Busqueda por destino (RF-05) -->
+      <form id="search-form" method="get" action="trips.html" class="hidden md:flex flex-1 max-w-md mx-8" role="search">
+        <div class="relative w-full">
+          <label for="search-destino" class="sr-only">Buscar por destino</label>
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray"
+                aria-hidden="true">search</span>
+          <input type="search" id="search-destino" name="destino" placeholder="Buscar destinos..."
+                 class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full
+                        font-body-md text-body-md text-on-surface outline-none transition-all
+                        placeholder:text-warm-gray focus:ring-2 focus:ring-deep-teal focus:border-transparent" />
+        </div>
+      </form>
+
+      <div class="flex items-center gap-6">
+        <nav class="hidden md:flex gap-6" aria-label="Navegacion principal">
+          <a href="../index.html" class="nav-link">Inicio</a>
+          <a href="trips.html" class="nav-link-active" aria-current="page">Viajes</a>
+          <a href="reservations.html" class="nav-link hidden" data-auth="user">Mis Reservaciones</a>
+          <a href="admin/dashboard.html" class="nav-link hidden" data-auth="admin">Administracion</a>
+        </nav>
+
+        <div class="flex items-center gap-2" data-auth="guest">
+          <a href="login.html" class="btn-ghost hidden md:inline-flex">Iniciar sesion</a>
+          <a href="register.html" class="btn-primary">Registro</a>
+        </div>
+
+        <div class="hidden items-center gap-3" data-auth="user">
+          <span class="hidden md:block font-body-sm text-body-sm text-on-surface-variant" data-user="nombre"></span>
+          <button type="button" id="logout-btn" class="btn-ghost">
+            <span class="material-symbols-outlined text-lg" aria-hidden="true">logout</span>
+            Salir
+          </button>
+        </div>
+
+        <button type="button" id="mobile-menu-btn"
+                class="md:hidden p-2 text-on-surface-variant rounded-lg hover:bg-surface-container-high"
+                aria-label="Abrir menu" aria-expanded="false" aria-controls="mobile-menu">
+          <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+        </button>
+      </div>
+    </div>
+
+    <nav id="mobile-menu" class="hidden md:hidden border-t border-outline-variant/40 bg-surface"
+         aria-label="Navegacion movil">
+      <div class="shell flex flex-col py-4 gap-1">
+        <a href="../index.html" class="py-3 nav-link">Inicio</a>
+        <a href="trips.html" class="py-3 nav-link-active border-b-0">Viajes</a>
+        <a href="reservations.html" class="py-3 nav-link hidden" data-auth="user">Mis Reservaciones</a>
+        <a href="admin/dashboard.html" class="py-3 nav-link hidden" data-auth="admin">Administracion</a>
+        <a href="login.html" class="py-3 nav-link" data-auth="guest">Iniciar sesion</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="shell grow pt-28 pb-16 w-full flex flex-col md:flex-row gap-8">
+
+    <!-- ==================================================================
+         Filtros (RF-06: destino, precio, fecha, disponibilidad)
+         El formulario usa GET, de modo que los filtros quedan en la URL y
+         la pagina sigue siendo funcional sin JavaScript.
+         ================================================================== -->
+    <aside class="w-full md:w-64 shrink-0">
+      <form id="filters-form" method="get" action="trips.html"
+            class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(0,52,65,0.05)] md:sticky md:top-28">
+
+        <h2 class="font-headline-sm text-headline-sm text-on-background mb-6">Filtros</h2>
+
+        <!-- Destino -->
+        <div class="mb-6">
+          <label for="filtro-destino" class="field-label">Destino</label>
+          <input type="text" id="filtro-destino" name="destino" placeholder="Ej. Italia"
+                 class="field py-2 text-body-sm" autocomplete="off" />
+        </div>
+
+        <!-- Precio -->
+        <div class="mb-6">
+          <label for="filtro-precio" class="field-label">Precio maximo</label>
+          <input type="range" id="filtro-precio" name="precio_max" min="0" max="10000" step="100" value="10000"
+                 class="w-full accent-deep-teal" />
+          <div class="flex justify-between font-body-sm text-body-sm text-on-surface-variant mt-1">
+            <span>$0</span>
+            <span id="precio-max-label">$10,000</span>
+          </div>
+        </div>
+
+        <!-- Fechas -->
+        <fieldset class="mb-6">
+          <legend class="field-label">Fechas</legend>
+          <div class="space-y-3">
+            <div>
+              <label for="filtro-salida" class="block font-body-sm text-body-sm text-on-surface-variant mb-1">Salida desde</label>
+              <input type="date" id="filtro-salida" name="salida" class="field py-2 text-body-sm" />
+            </div>
+            <div>
+              <label for="filtro-regreso" class="block font-body-sm text-body-sm text-on-surface-variant mb-1">Regreso hasta</label>
+              <input type="date" id="filtro-regreso" name="regreso" class="field py-2 text-body-sm" />
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Disponibilidad -->
+        <fieldset class="mb-6">
+          <legend class="field-label">Disponibilidad</legend>
+          <label class="flex items-center gap-2 cursor-pointer group py-1">
+            <input type="checkbox" name="disponibles" value="1" checked
+                   class="rounded border-outline-variant text-deep-teal focus:ring-deep-teal" />
+            <span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">
+              Solo con cupos disponibles
+            </span>
+          </label>
+        </fieldset>
+
+        <div class="flex flex-col gap-2">
+          <button type="submit" class="btn-primary w-full">Aplicar filtros</button>
+          <a href="trips.html"
+             class="w-full text-center py-2 rounded-lg border border-outline-variant bg-surface-container-low
+                    text-primary font-body-md text-body-md hover:bg-surface-container-high transition-colors">
+            Limpiar filtros
+          </a>
+        </div>
+      </form>
+    </aside>
+
+    <!-- ==================================================================
+         Catalogo (RF-04)
+         ================================================================== -->
+    <section class="flex-1" aria-labelledby="catalogo-titulo">
+
+      <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+        <div>
+          <h1 id="catalogo-titulo" class="font-headline-md text-headline-md text-deep-teal">Viajes disponibles</h1>
+          <p id="trips-count" class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+            Mostrando 3 viajes
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 text-on-surface-variant">
+          <label for="orden" class="font-body-sm text-body-sm">Ordenar por:</label>
+          <select id="orden" name="orden"
+                  class="bg-transparent border-none font-body-md text-body-md font-semibold text-primary
+                         focus:ring-0 cursor-pointer">
+            <option value="salida">Fecha de salida</option>
+            <option value="precio_asc">Precio: menor a mayor</option>
+            <option value="precio_desc">Precio: mayor a menor</option>
+            <option value="destino">Destino (A-Z)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Estado: cargando -->
+      <div id="trips-loading" class="hidden grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter" aria-hidden="true">
+        <div class="card"><div class="skeleton h-48 rounded-none"></div><div class="p-5 space-y-3"><div class="skeleton h-6 w-2/3"></div><div class="skeleton h-4 w-1/3"></div><div class="skeleton h-10 w-full"></div></div></div>
+        <div class="card"><div class="skeleton h-48 rounded-none"></div><div class="p-5 space-y-3"><div class="skeleton h-6 w-2/3"></div><div class="skeleton h-4 w-1/3"></div><div class="skeleton h-10 w-full"></div></div></div>
+        <div class="card"><div class="skeleton h-48 rounded-none"></div><div class="p-5 space-y-3"><div class="skeleton h-6 w-2/3"></div><div class="skeleton h-4 w-1/3"></div><div class="skeleton h-10 w-full"></div></div></div>
+      </div>
+
+      <!-- Estado: error (RF-20) -->
+      <div id="trips-error" class="hidden alert-error" role="alert">
+        <span class="material-symbols-outlined" aria-hidden="true">error</span>
+        <span id="trips-error-message">No fue posible cargar los viajes. Intenta de nuevo mas tarde.</span>
+      </div>
+
+      <!-- Estado: sin resultados -->
+      <div id="trips-empty" class="hidden text-center py-20">
+        <span class="material-symbols-outlined text-warm-gray text-[64px] mb-4" aria-hidden="true">travel_explore</span>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface mb-2">No encontramos viajes</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+          Prueba a cambiar el destino o a ampliar el rango de fechas.
+        </p>
+        <a href="trips.html" class="btn-secondary">Limpiar filtros</a>
+      </div>
+
+      <!-- Resultados -->
+      <div id="trips-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+
+        <article class="card premium-card group flex flex-col">
+          <div class="relative h-48 overflow-hidden">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1qn_vF1KaLyHpZtdHf9JyYILT6s6GWaF2VD2y-ytp2rqrZJDtg0EW9sPlwYdKi5B1ZAlfz0KFd2PCnbBpVzcTKHvvs5K0mMsgKCNZNEDNzOPD-jLqEZd9YGtCOwlTWKL_-fK1ClTQHfWvTkIkwiHG59tCtlrNCBd9MBedB4beYsB6cF-vv-k01Gs4wp6FGCg6tniEXLFL3LxcAItJ2KSaMtFpd-oapzUxP8lEjt3fNRwhmcZ4AaBqaA"
+                 alt="Costa Amalfitana con casas de colores sobre el acantilado"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <span class="chip-alert absolute top-4 right-4 shadow-sm">
+              <span class="material-symbols-outlined text-[14px]" aria-hidden="true">event_seat</span>
+              3 cupos
+            </span>
+          </div>
+
+          <div class="p-5 flex-1 flex flex-col">
+            <h2 class="font-headline-sm text-headline-sm text-on-background mb-2 line-clamp-1">Costa Amalfitana</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mb-4 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]" aria-hidden="true">location_on</span>
+              Italia
+            </p>
+
+            <div class="mt-auto space-y-4">
+              <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">calendar_month</span>
+                12 - 19 Oct 2026
+              </p>
+
+              <div class="flex justify-between items-end pt-4 border-t border-outline-variant/30 gap-3">
+                <div>
+                  <span class="font-label-caps text-label-caps text-on-surface-variant block">Desde</span>
+                  <span class="font-headline-sm text-headline-sm text-deep-teal">$2,450</span>
+                </div>
+                <a href="trip-detail.html?id=1" class="btn-primary px-4">Ver detalle</a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card premium-card group flex flex-col">
+          <div class="relative h-48 overflow-hidden">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDc0yf3zOH3Z-eEamkswPLIBSXFaEuDzE4JIUDV2KeSy-h_4aykcwCPrTwNJiKe9x3aRLuXzZmPtMIetDQCfyiH5yWi-G-tfAjUSxTYftLKfvEIuB5LuK3hBAj2gsSrEb81dHEfaw2Wf9UPq9zQ8x4chfh3CDInxpffaR_TFRBiT2W7poVc-VS4dpjsdF4oZXK7_9yeeT6kwEifHH5NGZNtaCXtwgSx5oQhIlnuuPP4XIJZqpqW1cvvEg"
+                 alt="Calle tradicional de Kioto durante la floracion de cerezos"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <span class="chip absolute top-4 right-4 shadow-sm">
+              <span class="material-symbols-outlined text-[14px]" aria-hidden="true">event_seat</span>
+              14 cupos
+            </span>
+          </div>
+
+          <div class="p-5 flex-1 flex flex-col">
+            <h2 class="font-headline-sm text-headline-sm text-on-background mb-2 line-clamp-1">Esencia de Kioto</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mb-4 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]" aria-hidden="true">location_on</span>
+              Japon
+            </p>
+
+            <div class="mt-auto space-y-4">
+              <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">calendar_month</span>
+                05 - 15 Nov 2026
+              </p>
+
+              <div class="flex justify-between items-end pt-4 border-t border-outline-variant/30 gap-3">
+                <div>
+                  <span class="font-label-caps text-label-caps text-on-surface-variant block">Desde</span>
+                  <span class="font-headline-sm text-headline-sm text-deep-teal">$3,100</span>
+                </div>
+                <a href="trip-detail.html?id=2" class="btn-primary px-4">Ver detalle</a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card premium-card group flex flex-col">
+          <div class="relative h-48 overflow-hidden">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB87pup9vu-gsZDCQKrNmx3RCiB5h1e-ZsC0Jaih8bM0Q4teMMgRLGvrJKne0-e0XOC8aSfkgvzHlHqF8yS9kSnMhgLlrC6deg37q1m1Kq6Q8DV-ZvqWMJJsLboghMOOQ1sodqG294jW8dSwrdSnOngtJY4J6cxGzOXIOfyblKscbfZN9cGz56cFjaqdyy5ZWbRQt9mjXG8hGsM6n1SQ61Ruymkm0iXlAaZ7IrnaHeUQjeXKesSG8yiQ"
+                 alt="Playa de arena blanca y bungalows sobre el agua en Maldivas"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <span class="chip absolute top-4 right-4 shadow-sm">
+              <span class="material-symbols-outlined text-[14px]" aria-hidden="true">event_seat</span>
+              9 cupos
+            </span>
+          </div>
+
+          <div class="p-5 flex-1 flex flex-col">
+            <h2 class="font-headline-sm text-headline-sm text-on-background mb-2 line-clamp-1">Retiro en Maldivas</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mb-4 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]" aria-hidden="true">location_on</span>
+              Maldivas
+            </p>
+
+            <div class="mt-auto space-y-4">
+              <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]" aria-hidden="true">calendar_month</span>
+                03 - 08 Nov 2026
+              </p>
+
+              <div class="flex justify-between items-end pt-4 border-t border-outline-variant/30 gap-3">
+                <div>
+                  <span class="font-label-caps text-label-caps text-on-surface-variant block">Desde</span>
+                  <span class="font-headline-sm text-headline-sm text-deep-teal">$4,800</span>
+                </div>
+                <a href="trip-detail.html?id=3" class="btn-primary px-4">Ver detalle</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Paginacion -->
+      <nav id="trips-pagination" class="mt-12 flex justify-center items-center gap-2" aria-label="Paginacion">
+        <button type="button" data-page="prev" disabled
+                class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high disabled:opacity-50 disabled:pointer-events-none"
+                aria-label="Pagina anterior">
+          <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+        </button>
+        <button type="button" data-page="1" aria-current="page"
+                class="w-10 h-10 rounded-lg bg-primary text-on-primary font-semibold">1</button>
+        <button type="button" data-page="next"
+                class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high disabled:opacity-50 disabled:pointer-events-none"
+                aria-label="Pagina siguiente">
+          <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+        </button>
+      </nav>
+    </section>
+  </main>
+
+  <!-- ==================================================================
+       Plantilla que trips.js clona por cada viaje que devuelve la API.
+       Los data-trip="*" marcan donde se inyecta cada campo.
+       ================================================================== -->
+  <template id="trip-card-template">
+    <article class="card premium-card group flex flex-col">
+      <div class="relative h-48 overflow-hidden">
+        <img src="" alt="" data-trip="imagen"
+             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <span class="chip absolute top-4 right-4 shadow-sm" data-trip="cupos-badge">
+          <span class="material-symbols-outlined text-[14px]" aria-hidden="true">event_seat</span>
+          <span data-trip="cupos"></span>
+        </span>
+      </div>
+
+      <div class="p-5 flex-1 flex flex-col">
+        <h2 class="font-headline-sm text-headline-sm text-on-background mb-2 line-clamp-1" data-trip="titulo"></h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mb-4 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]" aria-hidden="true">location_on</span>
+          <span data-trip="destino"></span>
+        </p>
+
+        <div class="mt-auto space-y-4">
+          <p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">calendar_month</span>
+            <span data-trip="fechas"></span>
+          </p>
+
+          <div class="flex justify-between items-end pt-4 border-t border-outline-variant/30 gap-3">
+            <div>
+              <span class="font-label-caps text-label-caps text-on-surface-variant block">Desde</span>
+              <span class="font-headline-sm text-headline-sm text-deep-teal" data-trip="precio"></span>
+            </div>
+            <a href="#" class="btn-primary px-4" data-trip="detalle-link">Ver detalle</a>
+          </div>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <!-- ================================================================== -->
+  <footer class="bg-tertiary-container w-full py-12 mt-auto">
+    <div class="shell grid grid-cols-1 md:grid-cols-4 gap-gutter">
+      <div class="col-span-1 md:col-span-2">
+        <span class="font-display-lg text-display-lg-mobile text-on-tertiary-container mb-4 block">TripTicks</span>
+        <p class="font-body-md text-body-md text-on-tertiary-container/80 max-w-sm mb-6">
+          Experiencias de viaje curadas para el viajero exigente.
+        </p>
+        <p class="font-body-sm text-body-sm text-on-tertiary-container/60">
+          &copy; 2026 TripTicks. Sistema de reservacion de viajes.
+        </p>
+      </div>
+
+      <div class="col-span-1">
+        <h2 class="font-label-caps text-label-caps text-secondary-container mb-4">EXPLORAR</h2>
+        <ul class="space-y-3">
+          <li><a href="../index.html" class="footer-link">Inicio</a></li>
+          <li><a href="trips.html" class="footer-link">Viajes</a></li>
+          <li><a href="reservations.html" class="footer-link">Mis reservaciones</a></li>
+        </ul>
+      </div>
+
+      <div class="col-span-1">
+        <h2 class="font-label-caps text-label-caps text-secondary-container mb-4">CUENTA</h2>
+        <ul class="space-y-3">
+          <li><a href="login.html" class="footer-link">Iniciar sesion</a></li>
+          <li><a href="register.html" class="footer-link">Crear cuenta</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/session.js"></script>
+  <script src="../js/trips.js"></script>
+</body>
+</html>
