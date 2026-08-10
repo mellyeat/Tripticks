@@ -1,0 +1,72 @@
+extends ../layouts/base.pug
+
+block variables
+  - var titulo = 'Detalle del viaje - TripTicks'
+  - var descripcion = 'Detalle del viaje: itinerario, fechas, precio y cupos disponibles.'
+  - var clasesBody = 'bg-off-white text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col'
+  - var scriptsVista = ['/js/trip-detail.js']
+
+block contenido
+  +encabezado("viajes")
+  main(class="shell grow pt-28 pb-16 w-full")
+    div#trip-error(class="hidden alert-error mb-8", role="alert")
+      | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#trip-error-message No encontramos el viaje solicitado.]
+    nav(class="mb-6 font-body-sm text-body-sm text-on-surface-variant", aria-label="Ruta de navegacion")
+      ol(class="flex items-center gap-2 flex-wrap")
+        li
+          a(href="/", class="hover:text-primary hover:underline") Inicio
+        li(aria-hidden="true") /
+        li
+          a(href="/trips", class="hover:text-primary hover:underline") Viajes
+        li(aria-hidden="true") /
+        li(class="text-primary font-semibold", data-trip="destino", aria-current="page")
+    figure(class="w-full h-[45vh] min-h-[320px] md:h-[60vh] md:min-h-[500px] rounded-xl overflow-hidden shadow-sm mb-12 relative group")
+      img(alt="", data-trip="imagen", class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105")
+      div(class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500")
+    div(class="grid grid-cols-1 lg:grid-cols-12 gap-12")
+      div(class="lg:col-span-8 space-y-12")
+        header
+          div(class="flex flex-wrap items-center gap-2 mb-4")
+            | #[span(class="chip") #[span(class="material-symbols-outlined text-[14px]", aria-hidden="true") location_on] #[span(data-trip="destino")]] #[span(class="chip", data-trip="duracion-chip") #[span(class="material-symbols-outlined text-[14px]", aria-hidden="true") schedule] #[span(data-trip="duracion")]]
+          h1(class="font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-4", data-trip="titulo")
+          div(class="flex flex-wrap items-center gap-6 text-on-surface-variant font-body-md text-body-md")
+            div(class="flex items-center gap-2")
+              | #[span(class="material-symbols-outlined text-secondary", aria-hidden="true") flight_takeoff] #[span Salida: #[strong(class="text-on-surface", data-trip="fecha-salida")]]
+            div(class="flex items-center gap-2")
+              | #[span(class="material-symbols-outlined text-secondary", aria-hidden="true") flight_land] #[span Regreso: #[strong(class="text-on-surface", data-trip="fecha-regreso")]]
+            div(class="flex items-center gap-2")
+              | #[span(class="material-symbols-outlined text-secondary", aria-hidden="true") event_seat] #[span #[strong(class="text-on-surface", data-trip="cupos")] cupos disponibles]
+        section(aria-labelledby="descripcion-titulo")
+          h2#descripcion-titulo(class="font-headline-md text-headline-md text-primary mb-4") La experiencia
+          p(class="font-body-lg text-body-lg text-on-surface leading-relaxed", data-trip="descripcion")
+        //- Los dias los pinta /js/trip-detail.js con la columna jsonb "itinerario".
+        section(aria-labelledby="itinerario-titulo")
+          h2#itinerario-titulo(class="font-headline-md text-headline-md text-primary mb-6") Itinerario dia a dia
+          ol#trip-itinerary(class="space-y-6 relative before:absolute before:inset-y-0 before:left-[19px] before:w-px before:bg-outline-variant")
+      div(class="lg:col-span-4")
+        div(class="lg:sticky lg:top-28 bg-surface p-6 md:p-8 rounded-xl shadow-[0_8px_30px_-4px_rgba(0,52,65,0.08)] border border-surface-container-high")
+          div(class="mb-6 flex justify-between items-end gap-4")
+            div
+              | #[span(class="block font-body-sm text-body-sm text-on-surface-variant") Precio] #[span(class="font-display-lg text-display-lg-mobile text-primary", data-trip="precio")]
+            span(class="font-body-sm text-body-sm text-on-surface-variant text-right") por persona
+          dl(class="border border-outline-variant rounded-lg overflow-hidden mb-4")
+            div(class="p-4 border-b border-outline-variant bg-off-white flex justify-between items-center gap-3")
+              div
+                dt(class="font-label-caps text-label-caps text-on-surface-variant mb-1") FECHAS
+                dd(class="font-body-md text-body-md text-primary font-semibold", data-trip="fechas")
+              span(class="material-symbols-outlined text-outline", aria-hidden="true") calendar_month
+            div(class="p-4 bg-off-white flex justify-between items-center gap-3")
+              div
+                dt(class="font-label-caps text-label-caps text-on-surface-variant mb-1") CUPOS DISPONIBLES
+                dd(class="font-body-md text-body-md text-primary font-semibold", data-trip="cupos")
+              span(class="material-symbols-outlined text-outline", aria-hidden="true") group
+          //- Los tres avisos arrancan ocultos: es trip-detail.js quien decide cual aplica.
+          div#availability-warning(class="hidden alert-warning mb-6")
+            | #[span(class="material-symbols-outlined is-filled", aria-hidden="true") error] #[span Quedan pocos cupos para estas fechas.]
+          div#availability-none(class="hidden alert-error mb-6", role="alert")
+            | #[span(class="material-symbols-outlined", aria-hidden="true") event_busy] #[span Este viaje ya no tiene cupos disponibles.]
+          div#already-reserved(class="hidden alert-success mb-6")
+            | #[span(class="material-symbols-outlined", aria-hidden="true") check_circle] #[span Ya tienes una reservacion activa para este viaje. #[a(href="/reservations", class="underline font-semibold") Verla]]
+          | #[a#reserve-btn(href="/checkout", data-trip="checkout-link", class="btn-primary w-full text-body-md py-4 hidden mb-4", data-auth="user") Reservar ahora #[span(class="material-symbols-outlined", aria-hidden="true") arrow_forward]] #[a#reserve-login-link(href="/login", class="btn-primary w-full text-body-md py-4 mb-4", data-auth="guest") Inicia sesion para reservar #[span(class="material-symbols-outlined", aria-hidden="true") login]]
+          p(class="text-center font-body-sm text-body-sm text-on-surface-variant") No se realizara ningun cargo en este paso.
+  +piePagina()
