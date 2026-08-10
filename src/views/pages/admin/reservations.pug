@@ -1,0 +1,147 @@
+extends ../../layouts/base.pug
+
+block variables
+  - var titulo = 'Gestion de reservaciones - TripTicks'
+  - var descripcion = 'Gestion de reservaciones de TripTicks: folios, estados y metodos de pago.'
+  - var clasesBody = 'bg-off-white text-on-surface font-body-md text-body-md antialiased min-h-screen'
+  - var scriptsVista = ['/js/admin/reservations.js']
+
+block contenido
+  +consolaAdmin("reservaciones")
+  main(class="md:ml-64 flex flex-col min-h-screen")
+    +barraAdmin()
+    div(class="flex-1 p-margin-mobile md:p-margin-desktop space-y-8")
+      section
+        h1(class="font-headline-md text-headline-md text-deep-teal mb-2") Gestion de reservaciones
+        p(class="font-body-lg text-body-lg text-warm-gray")
+          | Supervisa los folios, su estado y el metodo de pago con el que se registraron.
+
+      div#reservations-error(class="hidden alert-error", role="alert")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#reservations-error-message]
+
+      div#reservations-success(class="hidden alert-success", role="status")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") check_circle] #[span#reservations-success-message]
+
+      //-
+        Las cuatro metricas se cuentan sobre la columna "estado". El mockup
+        traia "Pendientes de pago", pero no hay estado de cobro en el esquema:
+        se sustituye por "Activas".
+      section(class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter", aria-label="Resumen de reservaciones")
+        article(class="stat-card flex items-center gap-4")
+          span(class="stat-icon bg-deep-teal/10 text-deep-teal rounded-full p-3")
+            span(class="material-symbols-outlined", aria-hidden="true") receipt_long
+          div
+            p(class="font-label-caps text-label-caps text-warm-gray mb-1") RESERVACIONES TOTALES
+            p(class="font-headline-md text-headline-md font-bold text-deep-teal", data-stat="total") --
+        article(class="stat-card flex items-center gap-4")
+          span(class="stat-icon bg-warm-sand text-deep-teal rounded-full p-3")
+            span(class="material-symbols-outlined", aria-hidden="true") event_available
+          div
+            p(class="font-label-caps text-label-caps text-warm-gray mb-1") ACTIVAS
+            p(class="font-headline-md text-headline-md font-bold text-deep-teal", data-stat="activas") --
+        article(class="stat-card flex items-center gap-4")
+          span(class="stat-icon bg-tertiary-fixed text-deep-teal rounded-full p-3")
+            span(class="material-symbols-outlined", aria-hidden="true") task_alt
+          div
+            p(class="font-label-caps text-label-caps text-warm-gray mb-1") COMPLETADAS
+            p(class="font-headline-md text-headline-md font-bold text-deep-teal", data-stat="completadas") --
+        article(class="stat-card flex items-center gap-4")
+          span(class="stat-icon bg-error-container text-on-error-container rounded-full p-3")
+            span(class="material-symbols-outlined", aria-hidden="true") cancel
+          div
+            p(class="font-label-caps text-label-caps text-warm-gray mb-1") CANCELADAS
+            p(class="font-headline-md text-headline-md font-bold text-deep-teal", data-stat="canceladas") --
+
+      section(class="card", aria-labelledby="reservaciones-titulo")
+        h2#reservaciones-titulo(class="sr-only") Listado de reservaciones
+
+        div(class="p-6 flex flex-col md:flex-row justify-between gap-4 border-b border-outline-variant/30")
+          div(class="flex flex-col sm:flex-row gap-4")
+            div(class="relative")
+              label(for="filtro-estado-reserva", class="sr-only") Filtrar por estado
+              select#filtro-estado-reserva(class="field-select")
+                option(value) Todos los estados
+                option(value="activa") Activa
+                option(value="cancelada") Cancelada
+                option(value="completada") Completada
+              span(class="field-select-icon")
+                span(class="material-symbols-outlined", aria-hidden="true") expand_more
+            div(class="relative")
+              label(for="filtro-metodo", class="sr-only") Filtrar por metodo de pago
+              select#filtro-metodo(class="field-select")
+                option(value) Todos los metodos
+                option(value="tarjeta") Tarjeta
+                option(value="paypal") PayPal
+              span(class="field-select-icon")
+                span(class="material-symbols-outlined", aria-hidden="true") expand_more
+            div
+              label(for="filtro-desde", class="sr-only") Desde
+              input#filtro-desde(type="date", class="field py-2", aria-label="Reservaciones creadas desde")
+          div(class="flex gap-2")
+            button#refrescar(type="button", class="icon-btn", aria-label="Actualizar listado")
+              span(class="material-symbols-outlined", aria-hidden="true") refresh
+
+        div(class="overflow-x-auto")
+          table(class="w-full border-collapse")
+            thead
+              tr(class="bg-surface-container-low border-b border-outline-variant/30")
+                th(scope="col", class="admin-th") Folio
+                th(scope="col", class="admin-th") Cliente
+                th(scope="col", class="admin-th") Viaje
+                th(scope="col", class="admin-th hidden sm:table-cell") Creada
+                th(scope="col", class="admin-th") Total
+                th(scope="col", class="admin-th") Estado
+                th(scope="col", class="admin-th text-right") Acciones
+            tbody#reservations-body(class="divide-y divide-outline-variant/20")
+
+        p#reservations-loading(class="text-center py-12 font-body-md text-body-md text-warm-gray") Cargando las reservaciones...
+        p#reservations-empty(class="hidden text-center py-12 font-body-md text-body-md text-warm-gray")
+          | No hay reservaciones que coincidan con el filtro.
+
+        div(class="p-6 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-outline-variant/30 bg-surface-container-low/50")
+          p#reservations-count(class="font-body-sm text-body-sm text-warm-gray")
+          nav#reservations-pagination(class="flex items-center gap-2", aria-label="Paginacion de reservaciones")
+
+  template#reservation-row-template
+    tr(class="admin-row")
+      td(class="admin-td font-semibold text-deep-teal", data-cell="folio")
+      td(class="admin-td")
+        div(class="flex items-center gap-3")
+          | #[span(class="avatar-initials w-8 h-8 text-xs", aria-hidden="true", data-cell="iniciales")] #[span #[span(class="block font-semibold text-on-surface", data-cell="cliente")] #[span(class="block text-warm-gray text-xs", data-cell="email")]]
+      td(class="admin-td text-warm-gray", data-cell="viaje")
+      td(class="admin-td text-warm-gray hidden sm:table-cell", data-cell="creada")
+      td(class="admin-td font-medium text-on-surface", data-cell="total")
+      td(class="admin-td")
+        span(data-cell="estado")
+      td(class="admin-td text-right")
+        div(class="flex items-center justify-end gap-1")
+          a(class="icon-btn border-transparent shadow-none", data-cell="detalle-link", aria-label="Ver el detalle")
+            span(class="material-symbols-outlined", aria-hidden="true") visibility
+          button(type="button", class="icon-btn border-transparent shadow-none", data-action="estado", aria-label="Cambiar el estado")
+            span(class="material-symbols-outlined", aria-hidden="true") published_with_changes
+
+  //-
+    Cambio de estado (RF-15). Cancelar libera el cupo y pasa por la funcion
+    transaccional de la base; completar solo marca el folio.
+  dialog#estado-dialog(class="rounded-xl p-0 backdrop:bg-primary/40 backdrop:backdrop-blur-sm max-w-md w-[calc(100%-2rem)]")
+    form#estado-form(class="bg-surface-container-lowest p-6 md:p-8", novalidate)
+      h2(class="font-headline-sm text-headline-sm text-primary mb-3") Cambiar el estado
+      p(class="font-body-md text-body-md text-on-surface-variant mb-6")
+        | Reservacion #[strong(class="text-on-surface", data-cell="folio")]. Cancelarla libera el lugar en el viaje y no se puede revertir.
+
+      div#estado-error(class="hidden alert-error mb-4", role="alert")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#estado-error-message]
+
+      div(class="mb-8")
+        label(for="nuevo-estado", class="field-label") NUEVO ESTADO
+        div(class="relative")
+          select#nuevo-estado(name="estado", class="field-select")
+            option(value="activa") Activa
+            option(value="completada") Completada
+            option(value="cancelada") Cancelada
+          span(class="field-select-icon")
+            span(class="material-symbols-outlined", aria-hidden="true") expand_more
+
+      div(class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3")
+        button#estado-cancel-btn(type="button", class="btn-ghost") Cancelar
+        button(type="submit", class="btn-primary") Guardar

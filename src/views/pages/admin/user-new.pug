@@ -1,0 +1,92 @@
+extends ../../layouts/base.pug
+
+block variables
+  - var titulo = 'Anadir usuario - TripTicks'
+  - var descripcion = 'Alta de un nuevo usuario en TripTicks desde la consola de administracion.'
+  - var clasesBody = 'bg-off-white text-on-surface font-body-md text-body-md antialiased min-h-screen'
+  - var scriptsVista = ['/js/admin/forms.js']
+
+block contenido
+  +consolaAdmin("usuarios")
+  main(class="md:ml-64 flex flex-col min-h-screen")
+    +barraAdmin()
+    div(class="flex-1 p-margin-mobile md:p-margin-desktop space-y-8")
+      section
+        h1(class="font-headline-md text-headline-md text-deep-teal mb-2") Anadir nuevo usuario
+        p(class="font-body-lg text-body-lg text-warm-gray max-w-3xl")
+          | Completa los datos para registrar una cuenta. Asigna el rol con cuidado: un administrador puede modificar el catalogo y las reservaciones de todos.
+      div#form-error(class="hidden alert-error", role="alert")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#form-error-message]
+      form#user-form(novalidate, class="card")
+        div(class="form-section")
+          div(class="form-section-aside")
+            h2(class="font-headline-sm text-headline-sm text-deep-teal mb-2") Informacion personal
+            p(class="font-body-sm text-body-sm text-warm-gray") Datos basicos para identificar y contactar al usuario.
+          div(class="form-section-fields")
+            div(class="sm:col-span-2")
+              label(for="nombre", class="field-label") NOMBRE COMPLETO
+              input#nombre(type="text", name="nombre", class="field", required, minlength="3", maxlength="100", autocomplete="name", placeholder="Ej. Ana Martinez")
+              p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="nombre", role="alert")
+              p(class="form-hint") Entre 3 y 100 caracteres.
+            div
+              label(for="email", class="field-label") CORREO ELECTRONICO
+              input#email(type="email", name="email", class="field", required, maxlength="255", autocomplete="email", placeholder="ana@ejemplo.com")
+              p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="email", role="alert")
+            //-
+              El telefono viene del mockup, pero la tabla "usuarios" no
+              tiene esa columna: se captura y no se envia.
+            div
+              label(for="telefono", class="field-label") TELEFONO
+              input#telefono(type="tel", name="telefono", class="field", autocomplete="tel", placeholder="+52 55 1234 5678")
+              p(class="form-hint")
+                | #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") info] Solo informativo: la tabla de usuarios no guarda telefono.
+        div(class="form-section")
+          div(class="form-section-aside")
+            h2(class="font-headline-sm text-headline-sm text-deep-teal mb-2") Configuracion de cuenta
+            p(class="font-body-sm text-body-sm text-warm-gray") Define los permisos y el estado inicial de la cuenta.
+          div(class="form-section-fields")
+            div
+              label(for="rol", class="field-label") ROL
+              div(class="relative")
+                select#rol(name="rol", class="field-select", required)
+                p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="rol", role="alert")
+                  option(value="usuario", selected) Usuario
+                  option(value="administrador") Administrador
+                span(class="field-select-icon")
+                  span(class="material-symbols-outlined", aria-hidden="true") expand_more
+            div
+              label(for="activo", class="field-label") ESTADO INICIAL
+              div(class="relative")
+                select#activo(name="activo", class="field-select", required)
+                  option(value="true", selected) Activo
+                  option(value="false") Inactivo
+                span(class="field-select-icon")
+                  span(class="material-symbols-outlined", aria-hidden="true") expand_more
+              p(class="form-hint") Una cuenta inactiva no puede iniciar sesion.
+        div(class="form-section")
+          div(class="form-section-aside")
+            h2(class="font-headline-sm text-headline-sm text-deep-teal mb-2") Seguridad
+            p(class="font-body-sm text-body-sm text-warm-gray") Credenciales iniciales de acceso.
+          div(class="form-section-fields")
+            div(class="sm:col-span-2")
+              label(for="password", class="field-label") CONTRASENA TEMPORAL
+              div(class="relative")
+                input#password(type="password", name="password", class="field pr-12", required, autocomplete="new-password", placeholder="Minimo 8 caracteres")
+                p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="password", role="alert")
+                button(type="button", data-toggle-password="password", class="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray hover:text-deep-teal p-1 rounded", aria-label="Mostrar contrasena")
+                  span(class="material-symbols-outlined text-xl", aria-hidden="true") visibility
+              p(class="form-hint")
+                | #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") info] Al menos 8 caracteres, con una mayuscula, una minuscula y un numero.
+            //-
+              "Forzar cambio de contrasena" requiere una columna que la
+              tabla no tiene y un paso en el login que no existe. Se deja
+              visible pero deshabilitado en vez de prometerlo.
+            div(class="sm:col-span-2")
+              div(class="flex items-start gap-3 opacity-60")
+                input#forzar-cambio(type="checkbox", class="checkbox mt-1", disabled)
+                label(for="forzar-cambio", class="font-body-sm text-body-sm text-on-surface-variant")
+                  | Forzar cambio de contrasena en el primer acceso #[span(class="block text-warm-gray") Requiere una columna nueva en #[code usuarios] y un paso extra en el login.]
+      div(class="flex justify-end gap-3")
+        a(href="/admin/users", class="btn-ghost") Cancelar
+        button(type="submit", form="user-form", class="btn-primary")
+          | #[span(class="material-symbols-outlined text-xl", aria-hidden="true") save] Guardar usuario

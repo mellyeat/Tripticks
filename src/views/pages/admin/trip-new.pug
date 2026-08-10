@@ -1,0 +1,143 @@
+extends ../../layouts/base.pug
+
+block variables
+  - var titulo = 'Crear nuevo viaje - TripTicks'
+  - var descripcion = 'Alta de un nuevo viaje en el catalogo de TripTicks.'
+  - var clasesBody = 'bg-off-white text-on-surface font-body-md text-body-md antialiased min-h-screen'
+  - var scriptsVista = ['/js/admin/forms.js']
+
+block contenido
+  +consolaAdmin("viajes")
+  main(class="md:ml-64 flex flex-col min-h-screen")
+    +barraAdmin()
+    div(class="flex-1 p-margin-mobile md:p-margin-desktop space-y-8")
+      section(class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4")
+        div
+          h1(class="font-headline-md text-headline-md text-deep-teal mb-2") Crear nuevo viaje
+          p(class="font-body-lg text-body-lg text-warm-gray") Configura los detalles de una nueva experiencia de viaje.
+        div(class="flex gap-3 w-full md:w-auto")
+          a(href="/admin/trips", class="btn-ghost flex-1 md:flex-none") Cancelar
+          button(type="submit", form="trip-form", class="btn-primary flex-1 md:flex-none")
+            | #[span(class="material-symbols-outlined text-xl", aria-hidden="true") check] Publicar viaje
+      div#form-error(class="hidden alert-error", role="alert")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#form-error-message]
+      form#trip-form(novalidate, class="card")
+        //-
+          Informacion general. El mockup mostraba el destino como un
+          desplegable de destinos existentes, pero "destino" es texto
+          libre (3 a 120 caracteres) y un viaje nuevo puede estrenar
+          destino: se deja como campo de texto.
+        div(class="form-section")
+          div(class="form-section-aside")
+            h2(class="font-headline-sm text-headline-sm text-deep-teal mb-2 flex items-center gap-2")
+              | #[span(class="material-symbols-outlined", aria-hidden="true") info] Informacion general
+            p(class="font-body-sm text-body-sm text-warm-gray") Como se presenta el viaje en el catalogo.
+          div(class="form-section-fields")
+            div(class="sm:col-span-2")
+              label(for="titulo", class="field-label") TITULO DEL VIAJE
+              input#titulo(type="text", name="titulo", class="field", required, minlength="5", maxlength="150", placeholder="Ej. Retiro Alpino Exclusivo en los Dolomitas")
+              p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="titulo", role="alert")
+              p(class="form-hint") Entre 5 y 150 caracteres.
+            div(class="sm:col-span-2")
+              label(for="destino", class="field-label") DESTINO
+              div(class="relative")
+                span(class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray text-xl", aria-hidden="true") location_on
+                input#destino(type="text", name="destino", class="field field-icon", required, minlength="3", maxlength="120", placeholder="Ej. Dolomitas, Italia")
+                p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="destino", role="alert")
+            //-
+              La categoria viene del mockup, pero la tabla "viajes" no
+              tiene esa columna: se captura en la interfaz y no se envia,
+              igual que la nacionalidad en el registro.
+            div(class="sm:col-span-2")
+              span(class="field-label") CATEGORIA
+              div(class="flex flex-wrap gap-3")
+                label(class="cursor-pointer")
+                  input(type="checkbox", class="sr-only", name="categoria", value="lujo")
+                  span(class="chip-interest")
+                    | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Lujo
+                label(class="cursor-pointer")
+                  input(type="checkbox", class="sr-only", name="categoria", value="aventura")
+                  span(class="chip-interest")
+                    | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Aventura
+                label(class="cursor-pointer")
+                  input(type="checkbox", class="sr-only", name="categoria", value="cultura")
+                  span(class="chip-interest")
+                    | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Cultura
+                label(class="cursor-pointer")
+                  input(type="checkbox", class="sr-only", name="categoria", value="bienestar")
+                  span(class="chip-interest")
+                    | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Bienestar
+              p(class="form-hint")
+                | #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") info] Solo informativa: la tabla de viajes no guarda categoria.
+            div(class="sm:col-span-2")
+              label(for="descripcion", class="field-label") DESCRIPCION
+              textarea#descripcion(name="descripcion", class="field min-h-40", required, minlength="20", maxlength="2000", data-contador="descripcion-contador", placeholder="Describe la experiencia con detalle...")
+              p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="descripcion", role="alert")
+              p(class="form-hint justify-end")
+                | #[span#descripcion-contador 0] / 2000 caracteres (minimo 20)
+        div(class="form-section")
+          div(class="form-section-aside")
+            h2(class="font-headline-sm text-headline-sm text-deep-teal mb-2 flex items-center gap-2")
+              | #[span(class="material-symbols-outlined", aria-hidden="true") event] Fechas y cupos
+            p(class="font-body-sm text-body-sm text-warm-gray") La duracion se calcula sola a partir de las fechas.
+          div(class="form-section-fields")
+            div
+              label(for="fecha-salida", class="field-label") FECHA DE SALIDA
+              input#fecha-salida(type="date", name="fecha_salida", class="field", required)
+              p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="fecha_salida", role="alert")
+            div
+              label(for="fecha-regreso", class="field-label") FECHA DE REGRESO
+              input#fecha-regreso(type="date", name="fecha_regreso", class="field", required)
+              p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="fecha_regreso", role="alert")
+              p(class="form-hint") No puede ser anterior a la salida.
+            div
+              label(for="cupos-totales", class="field-label") CUPOS TOTALES
+              input#cupos-totales(type="number", name="cupos_totales", class="field", required, min="1", step="1", placeholder="12")
+              p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="cupos_totales", role="alert")
+              p(class="form-hint")
+                | Al crear el viaje, los cupos disponibles parten de este numero.
+        div(class="form-section")
+          div(class="form-section-aside")
+            h2(class="font-headline-sm text-headline-sm text-deep-teal mb-2 flex items-center gap-2")
+              | #[span(class="material-symbols-outlined", aria-hidden="true") sell] Precio e imagen
+            p(class="font-body-sm text-body-sm text-warm-gray") El precio es por persona, sin impuestos.
+          div(class="form-section-fields")
+            div
+              label(for="precio", class="field-label") PRECIO POR PERSONA
+              div(class="relative")
+                span(class="absolute left-4 top-1/2 -translate-y-1/2 text-warm-gray", aria-hidden="true") $
+                input#precio(type="number", name="precio", class="field pl-8", required, min="0.01", step="0.01", placeholder="2450.00")
+                p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="precio", role="alert")
+              p(class="form-hint") Al reservar se le suma 16% de impuestos.
+            div
+              label(for="imagen-url", class="field-label") URL DE LA IMAGEN
+              input#imagen-url(type="url", name="imagen_url", class="field", required, minlength="5", maxlength="500", placeholder="https://images.unsplash.com/photo-...?auto=format&fit=crop&q=80&w=2000")
+              p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="imagen_url", role="alert")
+        //-
+          Itinerario. Se guarda como jsonb: un arreglo de objetos con
+          dia, titulo y descripcion. Cada bloque de aqui es un elemento
+          de ese arreglo.
+        div(class="form-section")
+          div(class="form-section-aside")
+            h2(class="font-headline-sm text-headline-sm text-deep-teal mb-2 flex items-center gap-2")
+              | #[span(class="material-symbols-outlined", aria-hidden="true") route] Itinerario
+            p(class="font-body-sm text-body-sm text-warm-gray") Un bloque por dia. Puede quedar vacio y completarse despues.
+          div(class="md:col-span-2")
+            ol#itinerario(class="space-y-4")
+            button#agregar-dia(type="button", class="btn-secondary mt-4")
+              | #[span(class="material-symbols-outlined text-xl", aria-hidden="true") add] Agregar dia
+        div(class="form-section")
+          div(class="form-section-aside")
+            h2(class="font-headline-sm text-headline-sm text-deep-teal mb-2 flex items-center gap-2")
+              | #[span(class="material-symbols-outlined", aria-hidden="true") visibility] Publicacion
+            p(class="font-body-sm text-body-sm text-warm-gray") Un viaje inactivo no aparece en el catalogo publico.
+          div(class="md:col-span-2")
+            div(class="flex items-center justify-between gap-4 py-3")
+              label(for="activo", class="font-body-md text-body-md text-on-surface cursor-pointer") Publicar el viaje al guardarlo
+              span(class="toggle")
+                input#activo(type="checkbox", name="activo", checked)
+                span(class="toggle-track")
+      div(class="flex justify-end gap-3")
+        a(href="/admin/trips", class="btn-ghost") Cancelar
+        button(type="submit", form="trip-form", class="btn-primary")
+          | #[span(class="material-symbols-outlined text-xl", aria-hidden="true") check] Publicar viaje
