@@ -1,0 +1,145 @@
+extends ../layouts/base.pug
+
+block variables
+  - var titulo = 'Mi perfil - TripTicks'
+  - var descripcion = 'Gestiona tu informacion personal en TripTicks.'
+  - var clasesBody = 'bg-background text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col'
+
+block contenido
+  +encabezado("perfil")
+  main(class="shell grow pt-32 pb-16 w-full flex flex-col md:flex-row gap-gutter")
+    //-
+      Menu lateral de la cuenta (identico en profile / security /
+      payment-methods; solo cambia cual enlace lleva la clase activa).
+    +menuCuenta("perfil")
+    div(class="grow space-y-12")
+      div
+        h1(class="font-headline-md text-headline-md text-on-surface") Tu perfil
+        p(class="text-on-surface-variant mt-2")
+          | Gestiona tu informacion y preferencias para una experiencia de viaje personalizada.
+      //- Mensajes de resultado (RF-19, RF-20)
+      div#profile-error(class="hidden alert-error", role="alert")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#profile-error-message]
+      div#profile-success(class="hidden alert-success", role="status")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") check_circle] #[span Tus cambios se guardaron correctamente.]
+      //-
+        Informacion personal
+        "nombre" y "correo" corresponden a las columnas que define
+        RF-01. El resto (foto, telefono, fecha de nacimiento y
+        nacionalidad) requiere columnas nuevas en la tabla users;
+        quedan listos en la interfaz para cuando se agreguen.
+      section(class="panel", aria-labelledby="datos-titulo")
+        h2#datos-titulo(class="panel-title") Informacion personal
+        form#profile-form(novalidate)
+          div(class="flex flex-col md:flex-row gap-8 mb-8 items-start")
+            //-
+              La tabla de usuarios no guarda foto: en su lugar van las iniciales
+              del nombre, que es dato real y no necesita columna nueva.
+            div(class="flex flex-col items-center gap-4 mx-auto md:mx-0")
+              span(class="avatar-initials w-32 h-32 text-headline-md border-2 border-primary-container", aria-hidden="true")= iniciales
+            div(class="grow grid grid-cols-1 md:grid-cols-2 gap-6 w-full")
+              div
+                label(for="perfil-nombre", class="field-label") NOMBRE COMPLETO
+                input#perfil-nombre(type="text", name="nombre", class="field", required, autocomplete="name", data-user="nombre", value=usuario.nombre)
+              div
+                label(for="perfil-correo", class="field-label") CORREO ELECTRONICO
+                input#perfil-correo(type="email", name="correo", class="field", required, autocomplete="email", data-user="correo", value=usuario.email)
+              div
+                label(for="perfil-telefono", class="field-label") TELEFONO
+                input#perfil-telefono(type="tel", name="telefono", class="field", autocomplete="tel", placeholder="+52 55 1234 5678")
+              div
+                label(for="perfil-nacimiento", class="field-label") FECHA DE NACIMIENTO
+                input#perfil-nacimiento(type="date", name="fecha_nacimiento", class="field")
+              div(class="md:col-span-2")
+                label(for="perfil-nacionalidad", class="field-label") NACIONALIDAD
+                div(class="relative")
+                  select#perfil-nacionalidad(name="nacionalidad", class="field-select")
+                    option(value) Selecciona una opcion
+                    option(value="MX") Mexico
+                    option(value="ES") Espana
+                    option(value="AR") Argentina
+                    option(value="CO") Colombia
+                    option(value="CL") Chile
+                    option(value="PE") Peru
+                    option(value="US") Estados Unidos
+                  span(class="field-select-icon")
+                    span(class="material-symbols-outlined", aria-hidden="true") expand_more
+          div(class="flex justify-end")
+            button(type="submit", class="btn-primary") Guardar cambios
+      //-
+        Preferencias de viaje
+        No hay ningun requerimiento que las contemple ni columnas que
+        las respalden. Se dejan como interfaz para la demostracion.
+      section#preferencias(class="panel", aria-labelledby="preferencias-titulo")
+        h2#preferencias-titulo(class="panel-title") Preferencias de viaje
+        div(class="alert-warning mb-6")
+          | #[span(class="material-symbols-outlined", aria-hidden="true") science] #[span #[strong Demostracion.] Estas preferencias todavia no se guardan: no forman parte de los requerimientos ni existen en el modelo de datos.]
+        fieldset(class="mb-8 pb-8 border-b border-outline-variant/40")
+          legend(class="font-headline-sm text-headline-sm text-primary mb-6") Intereses de viaje
+          div(class="flex flex-wrap gap-3")
+            label(class="cursor-pointer")
+              input(type="checkbox", class="sr-only", name="intereses", value="lujo")
+              span(class="chip-interest")
+                | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Lujo
+            label(class="cursor-pointer")
+              input(type="checkbox", class="sr-only", name="intereses", value="aventura")
+              span(class="chip-interest")
+                | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Aventura
+            label(class="cursor-pointer")
+              input(type="checkbox", class="sr-only", name="intereses", value="cultura")
+              span(class="chip-interest")
+                | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Cultura
+            label(class="cursor-pointer")
+              input(type="checkbox", class="sr-only", name="intereses", value="gastronomia")
+              span(class="chip-interest")
+                | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Gastronomia
+            label(class="cursor-pointer")
+              input(type="checkbox", class="sr-only", name="intereses", value="naturaleza")
+              span(class="chip-interest")
+                | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Naturaleza
+            label(class="cursor-pointer")
+              input(type="checkbox", class="sr-only", name="intereses", value="relajacion")
+              span(class="chip-interest")
+                | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Relajacion
+        div(class="mb-8 pb-8 border-b border-outline-variant/40")
+          h3(class="font-headline-sm text-headline-sm text-primary mb-6") Ajustes de localizacion
+          div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+            div
+              label(for="perfil-idioma", class="field-label") IDIOMA PREFERIDO
+              div(class="relative")
+                select#perfil-idioma(class="field-select")
+                  option(value="es", selected) Espanol
+                  option(value="en") English
+                  option(value="fr") Francais
+                span(class="field-select-icon")
+                  span(class="material-symbols-outlined", aria-hidden="true") expand_more
+            div
+              label(for="perfil-moneda", class="field-label") MONEDA PREFERIDA
+              div(class="relative")
+                select#perfil-moneda(class="field-select")
+                  option(value="mxn", selected) MXN - Peso mexicano
+                  option(value="usd") USD - Dolar estadounidense
+                  option(value="eur") EUR - Euro
+                span(class="field-select-icon")
+                  span(class="material-symbols-outlined", aria-hidden="true") expand_more
+        div
+          h3(class="font-headline-sm text-headline-sm text-primary mb-6") Notificaciones
+          ul(class="mb-8")
+            li(class="flex items-center justify-between gap-4 py-3 border-b border-outline-variant/40")
+              label(for="notif-ofertas", class="font-body-md text-body-md text-on-surface cursor-pointer") Ofertas exclusivas por correo
+              span(class="toggle")
+                input#notif-ofertas(type="checkbox")
+                span(class="toggle-track")
+            li(class="flex items-center justify-between gap-4 py-3 border-b border-outline-variant/40")
+              label(for="notif-sms", class="font-body-md text-body-md text-on-surface cursor-pointer") Alertas de reserva por SMS
+              span(class="toggle")
+                input#notif-sms(type="checkbox")
+                span(class="toggle-track")
+            li(class="flex items-center justify-between gap-4 py-3")
+              label(for="notif-recomendaciones", class="font-body-md text-body-md text-on-surface cursor-pointer") Recomendaciones personalizadas
+              span(class="toggle")
+                input#notif-recomendaciones(type="checkbox")
+                span(class="toggle-track")
+          div(class="flex justify-end")
+            button(type="button", class="btn-primary", disabled, title="Las preferencias todavia no se guardan") Guardar cambios
+  +piePagina()

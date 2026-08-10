@@ -1,0 +1,29 @@
+extends ../layouts/base.pug
+
+block variables
+  - var estadoPagina = estado || 500
+  - var titulo = estadoPagina + ' - TripTicks'
+  - var descripcion = 'La pagina que buscas no esta disponible en TripTicks.'
+  - var clasesBody = 'bg-off-white text-on-background font-body-md text-body-md antialiased min-h-screen flex flex-col'
+  - var noIndexar = true
+
+block contenido
+  +encabezado()
+
+  main(class="shell grow pt-32 pb-24 w-full flex flex-col items-center justify-center text-center")
+
+    span(class="material-symbols-outlined text-warm-gray text-[96px] mb-6", aria-hidden="true")
+      = estadoPagina === 404 ? "explore_off" : "error"
+
+    p(class="font-label-caps text-label-caps text-warm-gray mb-2") ERROR #{estadoPagina}
+
+    h1(class="font-headline-md text-headline-md text-deep-teal mb-4")
+      = estadoPagina === 404 ? "No encontramos esta pagina" : "Algo salio mal"
+
+    p(class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mb-10")= mensaje
+
+    div(class="flex flex-col sm:flex-row gap-3")
+      a(href="/", class="btn-primary") Volver al inicio
+      a(href="/trips", class="btn-secondary") Ver viajes disponibles
+
+  +piePagina()

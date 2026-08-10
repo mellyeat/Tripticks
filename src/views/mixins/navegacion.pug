@@ -1,0 +1,200 @@
+//-
+  Navegacion compartida por todas las vistas.
+  El servidor ya conoce al usuario (cookie de sesion), asi que el menu se
+  arma aqui en vez de esconderse y mostrarse con clases desde el navegador.
+
+mixin enlaceNav(destino, etiqueta, clave, activa, prefijo)
+  - var esActiva = clave === activa
+  a(
+    href=destino,
+    class=[prefijo, esActiva ? "nav-link-active" : "nav-link", esActiva && prefijo ? "border-b-0" : null],
+    aria-current=(esActiva ? "page" : false)
+  )= etiqueta
+
+mixin encabezado(activa, opciones)
+  - var config = opciones || {}
+  header#main-nav(class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md shadow-sm transition-all duration-300")
+    div(class="shell flex justify-between items-center py-4 gap-4")
+
+      a(href="/", class="font-display-lg text-display-lg-mobile text-deep-teal tracking-tight shrink-0 hover:scale-105 transition-transform duration-200") TripTicks
+
+      if config.busqueda
+        form#search-form(method="get", action="/trips", class="hidden md:flex flex-1 max-w-md mx-8", role="search")
+          div(class="relative w-full")
+            label(for="search-destino", class="sr-only") Buscar por destino
+            span(class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray", aria-hidden="true") search
+            input#search-destino(
+              type="search",
+              name="destino",
+              value=(config.destino || ""),
+              placeholder="Buscar destinos...",
+              class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full font-body-md text-body-md text-on-surface outline-none transition-all placeholder:text-warm-gray focus:ring-2 focus:ring-deep-teal focus:border-transparent"
+            )
+
+      div(class="flex items-center gap-6")
+        nav(class="hidden md:flex items-center gap-6", aria-label="Navegacion principal")
+          +enlaceNav("/", "Inicio", "inicio", activa)
+          +enlaceNav("/trips", "Viajes", "viajes", activa)
+          if usuario
+            +enlaceNav("/reservations", "Mis Reservaciones", "reservaciones", activa)
+          if usuario && usuario.rol === "administrador"
+            +enlaceNav("/admin", "Administracion", "admin", activa)
+
+        if usuario
+          div(class="flex items-center gap-3")
+            a(href="/profile", class="hidden md:flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors")
+              span(class="material-symbols-outlined", aria-hidden="true") account_circle
+              span(data-user="nombre")= usuario.nombre
+            button(type="button", data-action="logout", class="btn-ghost")
+              span(class="material-symbols-outlined text-lg", aria-hidden="true") logout
+              | Salir
+        else
+          div(class="flex items-center gap-2")
+            a(href="/login", class="btn-ghost hidden md:inline-flex") Iniciar sesion
+            a(href="/register", class="btn-primary") Registro
+
+        button#mobile-menu-btn(
+          type="button",
+          class="md:hidden p-2 text-on-surface-variant rounded-lg hover:bg-surface-container-high",
+          aria-label="Abrir menu",
+          aria-expanded="false",
+          aria-controls="mobile-menu"
+        )
+          span(class="material-symbols-outlined", aria-hidden="true") menu
+
+    nav#mobile-menu(class="hidden md:hidden border-t border-outline-variant/40 bg-surface", aria-label="Navegacion movil")
+      div(class="shell flex flex-col py-4 gap-1")
+        +enlaceNav("/", "Inicio", "inicio", activa, "py-3")
+        +enlaceNav("/trips", "Viajes", "viajes", activa, "py-3")
+        if usuario
+          +enlaceNav("/reservations", "Mis Reservaciones", "reservaciones", activa, "py-3")
+          +enlaceNav("/profile", "Mi perfil", "perfil", activa, "py-3")
+        if usuario && usuario.rol === "administrador"
+          +enlaceNav("/admin", "Administracion", "admin", activa, "py-3")
+        if !usuario
+          +enlaceNav("/login", "Iniciar sesion", "login", activa, "py-3")
+
+mixin piePagina()
+  footer(class="w-full py-12 bg-tertiary-container mt-auto")
+    div(class="shell grid grid-cols-1 md:grid-cols-4 gap-gutter")
+
+      div(class="col-span-1 md:col-span-2 space-y-4")
+        span(class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-tertiary-container block") TripTicks
+        p(class="font-body-sm text-body-sm text-on-tertiary-container/80 max-w-sm")
+          | Curando experiencias excepcionales para el viajero moderno.
+          | Sofisticacion, aventura y servicio impecable en cada destino.
+
+      div(class="col-span-1")
+        h2(class="font-label-caps text-label-caps text-secondary-container mb-4") EXPLORAR
+        ul(class="space-y-3")
+          li: a(href="/", class="footer-link") Inicio
+          li: a(href="/trips", class="footer-link") Viajes
+          if usuario
+            li: a(href="/reservations", class="footer-link") Mis reservaciones
+            li: a(href="/profile", class="footer-link") Mi perfil
+          else
+            li: a(href="/login", class="footer-link") Iniciar sesion
+            li: a(href="/register", class="footer-link") Crear cuenta
+
+      div(class="col-span-1")
+        h2(class="font-label-caps text-label-caps text-secondary-container mb-4") CONTACTO
+        div(class="flex gap-4")
+          a(
+            href="mailto:contacto@tripticks.com",
+            aria-label="Escribenos por correo",
+            class="w-10 h-10 rounded-full bg-on-tertiary-container/10 flex items-center justify-center text-on-tertiary-container hover:bg-on-tertiary-container/20 transition-colors"
+          )
+            span(class="material-symbols-outlined text-sm", aria-hidden="true") mail
+
+      div(class="col-span-1 md:col-span-4 mt-8 pt-8 border-t border-on-tertiary-container/10 flex flex-col md:flex-row justify-between items-center gap-4")
+        p(class="font-body-sm text-body-sm text-on-tertiary-container/60") &copy; 2026 TripTicks. Sistema de reservacion de viajes.
+        div(class="flex items-center gap-2 text-on-tertiary-container/60")
+          span(class="material-symbols-outlined text-sm", aria-hidden="true") public
+          span(class="font-body-sm text-body-sm") Global (ES)
+
+mixin enlaceCuenta(destino, icono, etiqueta, clave, activa)
+  a(
+    href=destino,
+    class=(clave === activa ? "account-link-active" : "account-link"),
+    aria-current=(clave === activa ? "page" : false)
+  )
+    span(class="material-symbols-outlined", aria-hidden="true")= icono
+    span= etiqueta
+
+mixin menuCuenta(activa)
+  aside(class="w-full md:w-64 shrink-0")
+    nav(class="flex flex-col gap-2 md:sticky md:top-32", aria-label="Secciones de la cuenta")
+      +enlaceCuenta("/profile", "person", "Informacion personal", "perfil", activa)
+      +enlaceCuenta("/security", "security", "Seguridad", "seguridad", activa)
+      +enlaceCuenta("/profile#preferencias", "tune", "Preferencias", "preferencias", activa)
+      +enlaceCuenta("/payment-methods", "payment", "Metodos de pago", "pagos", activa)
+
+      div(class="pt-8 mt-4 border-t border-outline-variant")
+        button(type="button", data-action="logout", class="account-link-danger")
+          span(class="material-symbols-outlined", aria-hidden="true") logout
+          span Cerrar sesion
+
+mixin enlaceAdmin(destino, icono, etiqueta, clave, activa)
+  - var esActiva = clave === activa
+  a(
+    href=destino,
+    class=(esActiva ? "admin-link-active" : "admin-link"),
+    aria-current=(esActiva ? "page" : false)
+  )
+    span(class=["material-symbols-outlined", esActiva ? "is-filled" : null], aria-hidden="true")= icono
+    span= etiqueta
+
+mixin consolaAdmin(activa)
+  aside(class="hidden md:flex flex-col fixed left-0 top-0 h-screen w-64 z-50 bg-surface-container-lowest border-r border-outline-variant shadow-sm")
+    div(class="flex flex-col h-full py-8 px-4")
+
+      div(class="mb-10 px-4")
+        a(href="/", class="font-display-lg text-headline-sm text-deep-teal block") TripTicks
+        p(class="font-body-sm text-body-sm text-warm-gray mt-1") Consola de administracion
+
+      nav(class="flex-1 space-y-2", aria-label="Secciones de administracion")
+        +enlaceAdmin("/admin", "dashboard", "Dashboard", "dashboard", activa)
+        +enlaceAdmin("/admin/users", "group", "Usuarios", "usuarios", activa)
+        +enlaceAdmin("/admin/trips", "explore", "Viajes", "viajes", activa)
+        +enlaceAdmin("/admin/reservations", "receipt_long", "Reservaciones", "reservaciones", activa)
+
+      div(class="mt-auto pt-6 border-t border-outline-variant space-y-2")
+        a(href="/admin/trips/new", class="btn-primary w-full mb-4")
+          span(class="material-symbols-outlined text-xl", aria-hidden="true") add
+          | Nuevo viaje
+
+        a(href="/profile", class="admin-link")
+          span(class="material-symbols-outlined", aria-hidden="true") settings
+          span Mi cuenta
+        button(type="button", data-action="logout", class="admin-link w-full text-left")
+          span(class="material-symbols-outlined", aria-hidden="true") logout
+          span Cerrar sesion
+
+        div(class="flex items-center gap-3 px-4 py-3 mt-4")
+          span(class="avatar-initials", aria-hidden="true")= iniciales
+          div(class="min-w-0")
+            p(class="font-body-sm text-body-sm font-semibold text-on-surface truncate", data-user="nombre")= usuario ? usuario.nombre : ""
+            p(class="font-label-caps text-label-caps text-warm-gray") Administrador
+
+mixin barraAdmin()
+  header(class="sticky top-0 z-40 flex items-center gap-4 h-16 px-margin-mobile md:px-margin-desktop bg-surface/80 backdrop-blur-md border-b border-outline-variant")
+
+    a(href="/", class="md:hidden font-display-lg text-headline-sm text-deep-teal") TripTicks
+
+    //- La busqueda global necesita endpoints que aun no existen.
+    div(class="flex-1 max-w-md hidden md:block")
+      div(class="relative")
+        span(class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray text-xl", aria-hidden="true") search
+        input(
+          type="search",
+          class="field field-icon rounded-full py-2",
+          disabled,
+          placeholder="Buscar reservaciones, usuarios o viajes...",
+          aria-label="Buscar en la consola",
+          title="Disponible proximamente"
+        )
+
+    div(class="flex items-center gap-2 ml-auto")
+      button(type="button", class="icon-btn border-transparent shadow-none", disabled, aria-label="Notificaciones", title="Disponible proximamente")
+        span(class="material-symbols-outlined", aria-hidden="true") notifications
+      span(class="avatar-initials w-8 h-8 text-xs", aria-hidden="true")= iniciales
