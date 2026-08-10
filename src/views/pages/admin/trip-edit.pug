@@ -1,0 +1,149 @@
+extends ../../layouts/base.pug
+
+block variables
+  - var titulo = 'Editar viaje - TripTicks'
+  - var descripcion = 'Edicion de un viaje del catalogo de TripTicks.'
+  - var clasesBody = 'bg-off-white text-on-surface font-body-md text-body-md antialiased min-h-screen'
+  - var scriptsVista = ['/js/admin/forms.js']
+
+block contenido
+  +consolaAdmin("viajes")
+  main(class="md:ml-64 flex flex-col min-h-screen")
+    +barraAdmin()
+    div(class="flex-1 p-margin-mobile md:p-margin-desktop space-y-8")
+      section(class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4")
+        div
+          h1(class="font-headline-md text-headline-md text-deep-teal mb-2") Editar: #{viaje.titulo}
+          p(class="font-body-lg text-body-lg text-warm-gray")
+            | Los cambios afectan al catalogo publico en cuanto se guarden.
+        div(class="flex gap-3 w-full lg:w-auto")
+          a(href="/admin/trips", class="btn-ghost flex-1 lg:flex-none") Cancelar
+          button(type="submit", form="trip-edit-form", class="btn-primary flex-1 lg:flex-none")
+            | #[span(class="material-symbols-outlined text-xl", aria-hidden="true") save] Guardar cambios
+      div#form-error(class="hidden alert-error", role="alert")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#form-error-message]
+      form#trip-edit-form(novalidate, class="grid grid-cols-1 lg:grid-cols-3 gap-gutter items-start")
+        div(class="lg:col-span-2 space-y-8")
+          section(class="panel", aria-labelledby="general-titulo")
+            h2#general-titulo(class="panel-title")
+              | #[span(class="material-symbols-outlined", aria-hidden="true") info] Informacion general
+            div(class="space-y-6")
+              div
+                label(for="titulo", class="field-label") TITULO DEL VIAJE
+                input#titulo(type="text", name="titulo", class="field", required, minlength="5", maxlength="150", value=viaje.titulo)
+                p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="titulo", role="alert")
+              div
+                label(for="destino", class="field-label") DESTINO
+                div(class="relative")
+                  span(class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray text-xl", aria-hidden="true") location_on
+                  input#destino(type="text", name="destino", class="field field-icon", required, minlength="3", maxlength="120", value=viaje.destino)
+                  p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="destino", role="alert")
+              //- Categoria: sin columna en la tabla, igual que en el alta.
+              div
+                span(class="field-label") CATEGORIA
+                div(class="flex flex-wrap gap-3")
+                  label(class="cursor-pointer")
+                    input(type="checkbox", class="sr-only", name="categoria", value="lujo")
+                    span(class="chip-interest")
+                      | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Lujo
+                  label(class="cursor-pointer")
+                    input(type="checkbox", class="sr-only", name="categoria", value="aventura")
+                    span(class="chip-interest")
+                      | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Aventura
+                  label(class="cursor-pointer")
+                    input(type="checkbox", class="sr-only", name="categoria", value="cultura")
+                    span(class="chip-interest")
+                      | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Cultura
+                  label(class="cursor-pointer")
+                    input(type="checkbox", class="sr-only", name="categoria", value="bienestar")
+                    span(class="chip-interest")
+                      | #[span(class="chip-check", aria-hidden="true") #[span(class="material-symbols-outlined text-[18px]") check]] Bienestar
+                p(class="form-hint")
+                  | #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") info] Solo informativa: la tabla de viajes no guarda categoria.
+              div
+                label(for="descripcion", class="field-label") DESCRIPCION
+                textarea#descripcion(name="descripcion", class="field min-h-40", required, minlength="20", maxlength="2000", data-contador="descripcion-contador")= viaje.descripcion
+                p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="descripcion", role="alert")
+                p(class="form-hint justify-end")
+                  | #[span#descripcion-contador 0] / 2000 caracteres (minimo 20)
+          //-
+            Imagen de portada. El mockup mostraba una galeria con varias
+            fotos, pero "viajes" guarda una sola imagen_url: una galeria
+            necesitaria una tabla aparte.
+          section(class="panel", aria-labelledby="imagen-titulo")
+            h2#imagen-titulo(class="panel-title")
+              | #[span(class="material-symbols-outlined", aria-hidden="true") image] Imagen de portada
+            div(class="flex flex-col sm:flex-row gap-6")
+              img(src=viaje.imagen_url, alt="Portada actual del viaje", class="w-full sm:w-48 h-32 rounded-lg object-cover shrink-0")
+              div(class="grow")
+                label(for="imagen-url", class="field-label") URL DE LA IMAGEN
+                input#imagen-url(type="url", name="imagen_url", class="field", required, minlength="5", maxlength="500", value=viaje.imagen_url)
+                p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="imagen_url", role="alert")
+                p(class="form-hint")
+                  | #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") info] Una galeria de varias fotos requeriria una tabla nueva.
+          section(class="panel", aria-labelledby="itinerario-titulo")
+            h2#itinerario-titulo(class="panel-title")
+              | #[span(class="material-symbols-outlined", aria-hidden="true") route] Itinerario
+            //-
+              Los dias guardados se pintan aqui con la misma estructura que crea
+              /js/admin/forms.js al agregar uno nuevo, para que quitar y
+              renumerar funcione igual sobre unos y otros.
+            ol#itinerario(class="space-y-4")
+              each dia, indice in (viaje.itinerario || [])
+                li(class="rounded-lg border border-outline-variant/50 bg-surface-container-lowest p-4 space-y-4")
+                  div(class="flex items-center justify-between gap-4")
+                    p(class="font-label-caps text-label-caps text-deep-teal")
+                      | DIA #[span(data-numero-dia)= indice + 1]
+                    button(type="button", data-quitar-dia, class="link-danger", aria-label="Quitar este dia")
+                      | #[span(class="material-symbols-outlined text-lg", aria-hidden="true") delete] Quitar
+                  div
+                    label(class="field-label") TITULO DEL DIA
+                    input(type="text", name="itinerario_titulo", class="field", value=dia.titulo)
+                  div
+                    label(class="field-label") DESCRIPCION DEL DIA
+                    textarea(name="itinerario_descripcion", class="field min-h-24")= dia.descripcion
+            button#agregar-dia(type="button", class="btn-secondary mt-4")
+              | #[span(class="material-symbols-outlined text-xl", aria-hidden="true") add] Agregar dia
+        div(class="space-y-8 lg:sticky lg:top-24")
+          section(class="panel", aria-labelledby="estado-titulo")
+            h2#estado-titulo(class="panel-title")
+              | #[span(class="material-symbols-outlined", aria-hidden="true") visibility] Estado del viaje
+            label(for="activo", class="field-label") VISIBILIDAD
+            div(class="relative")
+              select#activo(name="activo", class="field-select")
+                option(value="true", selected=viaje.activo) Activo (visible en el catalogo)
+                option(value="false", selected=!viaje.activo) Inactivo (oculto)
+              span(class="field-select-icon")
+                span(class="material-symbols-outlined", aria-hidden="true") expand_more
+            p(class="font-body-sm text-body-sm text-warm-gray mt-4")
+              | Un viaje activo aparece en el catalogo y acepta reservaciones. Desactivarlo no cancela las reservaciones ya registradas.
+          section(class="panel", aria-labelledby="logistica-titulo")
+            h2#logistica-titulo(class="panel-title")
+              | #[span(class="material-symbols-outlined", aria-hidden="true") payments] Logistica y precio
+            div(class="space-y-6")
+              div
+                label(for="fecha-salida", class="field-label") FECHA DE SALIDA
+                input#fecha-salida(type="date", name="fecha_salida", class="field", required, value=viaje.fecha_salida)
+                p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="fecha_salida", role="alert")
+              div
+                label(for="fecha-regreso", class="field-label") FECHA DE REGRESO
+                input#fecha-regreso(type="date", name="fecha_regreso", class="field", required, value=viaje.fecha_regreso)
+                p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="fecha_regreso", role="alert")
+              //- duracion_dias es una columna generada: se muestra, no se edita.
+              div
+                span(class="field-label") DURACION
+                div(class="flex items-center gap-2 px-4 py-3 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface-variant")
+                  | #[span(class="material-symbols-outlined text-warm-gray", aria-hidden="true") schedule] #{viaje.duracion_dias} dias
+                p(class="form-hint") Se calcula a partir de las fechas.
+              div
+                label(for="precio", class="field-label") PRECIO POR PERSONA
+                div(class="relative")
+                  span(class="absolute left-4 top-1/2 -translate-y-1/2 text-warm-gray", aria-hidden="true") $
+                  input#precio(type="number", name="precio", class="field pl-8", required, min="0.01", step="0.01", value=viaje.precio)
+                  p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="precio", role="alert")
+              div
+                label(for="cupos-totales", class="field-label") CUPOS TOTALES
+                input#cupos-totales(type="number", name="cupos_totales", class="field", required, min="1", step="1", value=viaje.cupos_totales)
+                p(class="mt-2 font-body-sm text-body-sm text-error hidden", data-error="cupos_totales", role="alert")
+                p(class="form-hint")
+                  | #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") group] Cupos disponibles ahora: #{viaje.cupos_disponibles} de #{viaje.cupos_totales}.
