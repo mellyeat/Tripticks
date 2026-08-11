@@ -7,3 +7,8 @@ coverage/
 .DS_Store
 Thumbs.db
 stitch_viaja_pro_platform/
+docs/evidencias/
+
+# Herramientas y notas locales: no forman parte del proyecto
+.claude/
+tareas.md
