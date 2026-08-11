@@ -1,0 +1,98 @@
+extends ../layouts/base.pug
+
+block variables
+  - var titulo = 'Viajes - TripTicks'
+  - var descripcion = 'Catalogo de viajes disponibles en TripTicks: busca, filtra y reserva.'
+  - var clasesBody = 'bg-off-white text-on-background font-body-md text-body-md antialiased min-h-screen flex flex-col'
+  - var scriptsVista = ['/js/trips.js']
+
+block contenido
+  +encabezado("viajes", { busqueda: true, destino: filtros.destino })
+  main(class="shell grow pt-28 pb-16 w-full flex flex-col md:flex-row gap-8")
+    aside(class="w-full md:w-64 shrink-0")
+      form#filters-form(method="get", action="/trips", class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(0,52,65,0.05)] md:sticky md:top-28")
+        h2(class="font-headline-sm text-headline-sm text-on-background mb-6") Filtros
+        div(class="mb-6")
+          label(for="filtro-destino", class="field-label") Destino
+          input#filtro-destino(type="text", name="destino", placeholder="Ej. Italia", class="field py-2 text-body-sm", autocomplete="off")
+        div(class="mb-6")
+          label(for="filtro-precio", class="field-label") Precio maximo
+          input#filtro-precio(type="range", name="precio_max", min="0", max="10000", step="100", value="10000", class="w-full accent-deep-teal")
+          div(class="flex justify-between font-body-sm text-body-sm text-on-surface-variant mt-1")
+            | #[span $0] #[span#precio-max-label $10,000]
+        fieldset(class="mb-6")
+          legend(class="field-label") Fechas
+          div(class="space-y-3")
+            div
+              label(for="filtro-salida", class="block font-body-sm text-body-sm text-on-surface-variant mb-1") Salida desde
+              input#filtro-salida(type="date", name="salida", class="field py-2 text-body-sm")
+            div
+              label(for="filtro-regreso", class="block font-body-sm text-body-sm text-on-surface-variant mb-1") Regreso hasta
+              input#filtro-regreso(type="date", name="regreso", class="field py-2 text-body-sm")
+        fieldset(class="mb-6")
+          legend(class="field-label") Disponibilidad
+          label(class="flex items-center gap-2 cursor-pointer group py-1")
+            input(type="checkbox", name="disponibles", value="1", checked, class="rounded border-outline-variant text-deep-teal focus:ring-deep-teal")
+            span(class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors") Solo con cupos disponibles
+        div(class="flex flex-col gap-2")
+          button(type="submit", class="btn-primary w-full") Aplicar filtros
+          a(href="/trips", class="w-full text-center py-2 rounded-lg border border-outline-variant bg-surface-container-low text-primary font-body-md text-body-md hover:bg-surface-container-high transition-colors") Limpiar filtros
+    section(class="flex-1", aria-labelledby="catalogo-titulo")
+      div(class="flex flex-wrap justify-between items-center gap-4 mb-6")
+        div
+          h1#catalogo-titulo(class="font-headline-md text-headline-md text-deep-teal") Viajes disponibles
+          p#trips-count(class="font-body-sm text-body-sm text-on-surface-variant mt-1")
+        div(class="flex items-center gap-2 text-on-surface-variant")
+          label(for="orden", class="font-body-sm text-body-sm") Ordenar por:
+          select#orden(name="orden", class="bg-transparent border-none font-body-md text-body-md font-semibold text-primary focus:ring-0 cursor-pointer")
+            option(value="salida") Fecha de salida
+            option(value="precio_asc") Precio: menor a mayor
+            option(value="precio_desc") Precio: mayor a menor
+            option(value="destino") Destino (A-Z)
+      div#trips-loading(class="hidden grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter", aria-hidden="true")
+        div(class="card")
+          div(class="skeleton h-48 rounded-none")
+          div(class="p-5 space-y-3")
+            div(class="skeleton h-6 w-2/3")
+            div(class="skeleton h-4 w-1/3")
+            div(class="skeleton h-10 w-full")
+        div(class="card")
+          div(class="skeleton h-48 rounded-none")
+          div(class="p-5 space-y-3")
+            div(class="skeleton h-6 w-2/3")
+            div(class="skeleton h-4 w-1/3")
+            div(class="skeleton h-10 w-full")
+        div(class="card")
+          div(class="skeleton h-48 rounded-none")
+          div(class="p-5 space-y-3")
+            div(class="skeleton h-6 w-2/3")
+            div(class="skeleton h-4 w-1/3")
+            div(class="skeleton h-10 w-full")
+      div#trips-error(class="hidden alert-error", role="alert")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#trips-error-message No fue posible cargar los viajes. Intenta de nuevo mas tarde.]
+      div#trips-empty(class="hidden text-center py-20")
+        span(class="material-symbols-outlined text-warm-gray text-[64px] mb-4", aria-hidden="true") travel_explore
+        h2(class="font-headline-sm text-headline-sm text-on-surface mb-2") No encontramos viajes
+        p(class="font-body-md text-body-md text-on-surface-variant mb-6") Prueba a cambiar el destino o a ampliar el rango de fechas.
+        a(href="/trips", class="btn-secondary") Limpiar filtros
+      //- Las tarjetas y la paginacion las arma /js/trips.js con lo que responde la API.
+      div#trips-grid(class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter")
+      nav#trips-pagination(class="mt-12 flex justify-center items-center gap-2", aria-label="Paginacion")
+  template#trip-card-template
+    article(class="card premium-card group flex flex-col")
+      div(class="relative h-48 overflow-hidden")
+        img(src, alt, data-trip="imagen", class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500")
+        span(class="chip absolute top-4 right-4 shadow-sm", data-trip="cupos-badge")
+          | #[span(class="material-symbols-outlined text-[14px]", aria-hidden="true") event_seat] #[span(data-trip="cupos")]
+      div(class="p-5 flex-1 flex flex-col")
+        h2(class="font-headline-sm text-headline-sm text-on-background mb-2 line-clamp-1", data-trip="titulo")
+        p(class="font-body-sm text-body-sm text-on-surface-variant mb-4 flex items-center gap-1")
+          | #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") location_on] #[span(data-trip="destino")]
+        div(class="mt-auto space-y-4")
+          p(class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-2")
+            | #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") calendar_month] #[span(data-trip="fechas")]
+          div(class="flex justify-between items-end pt-4 border-t border-outline-variant/30 gap-3")
+            div
+              | #[span(class="font-label-caps text-label-caps text-on-surface-variant block") Desde] #[span(class="font-headline-sm text-headline-sm text-deep-teal", data-trip="precio")]
+            a(href="#", class="btn-primary px-4", data-trip="detalle-link") Ver detalle
+  +piePagina()
