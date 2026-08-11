@@ -1,13 +1,8 @@
-// Cliente HTTP del frontend: centraliza la base de la API y el envio del token (RF-18)
 (function (global) {
   'use strict';
 
   var BASE = '/api';
 
-  /**
-   * Error con el mensaje y los detalles por campo que devolvio la API,
-   * para que los formularios puedan marcar los campos invalidos (RF-19, RF-20).
-   */
   function ErrorApi(mensaje, estado, detalles) {
     var error = new Error(mensaje);
     error.name = 'ErrorApi';
@@ -16,8 +11,6 @@
     return error;
   }
 
-  // El token lo administra session.js; se consulta al vuelo para no quedarse
-  // con un valor viejo despues de iniciar o cerrar sesion.
   function tokenActual() {
     return global.Sesion ? global.Sesion.obtenerToken() : null;
   }
@@ -42,8 +35,6 @@
       return respuesta
         .json()
         .catch(function () {
-          // Una respuesta sin JSON valido (502, timeout del proxy) no debe
-          // reventar aqui: se convierte en un error con mensaje presentable.
           return { exito: false, mensaje: 'El servidor no respondio correctamente.' };
         })
         .then(function (datos) {
@@ -51,11 +42,9 @@
             return datos.datos;
           }
 
-          // El token dejo de servir: se limpia la sesion y se manda a login.
-          // Solo si habia token, para no desviar un login fallido (RF-03).
           if (respuesta.status === 401 && tokenActual() && global.Sesion) {
             global.Sesion.cerrar();
-            global.location.href = '/pages/login.html?expirada=1';
+            global.location.href = '/login?expirada=1';
           }
 
           throw ErrorApi(datos.mensaje || 'Ocurrio un error.', respuesta.status, datos.detalles);
@@ -72,6 +61,9 @@
     },
     put: function (ruta, cuerpo) {
       return solicitar('PUT', ruta, cuerpo);
+    },
+    patch: function (ruta, cuerpo) {
+      return solicitar('PATCH', ruta, cuerpo);
     },
     del: function (ruta) {
       return solicitar('DELETE', ruta);

@@ -1,4 +1,3 @@
-// Estado de sesion en el navegador y ajuste de la interfaz segun el rol (RF-03, RF-17)
 (function (global) {
   'use strict';
 
@@ -15,8 +14,6 @@
     try {
       return JSON.parse(global.localStorage.getItem(CLAVE_USUARIO));
     } catch (error) {
-      // Un valor corrupto no debe dejar la pagina inservible: se trata como
-      // sesion inexistente y el usuario vuelve a iniciar sesion.
       return null;
     }
   }
@@ -40,18 +37,12 @@
     return Boolean(usuario) && usuario.rol === 'administrador';
   }
 
-  /**
-   * Muestra u oculta los elementos marcados con data-auth segun quien mira.
-   * Es solo presentacion: la autorizacion real la aplica el backend (RF-17).
-   */
   function aplicarInterfaz() {
     var usuario = obtenerUsuario();
     var estado = !usuario ? 'guest' : usuario.rol === 'administrador' ? 'admin' : 'user';
 
     documento.querySelectorAll('[data-auth]').forEach(function (elemento) {
       var requerido = elemento.getAttribute('data-auth');
-      // Un administrador tambien es un usuario autenticado, asi que ve los
-      // enlaces de data-auth="user" ademas de los suyos.
       var visible =
         requerido === estado || (requerido === 'user' && estado === 'admin');
 
@@ -65,15 +56,18 @@
     }
   }
 
-  /**
-   * Cierra sesion (RF-03). Se avisa al backend para dejar el evento en la
-   * bitacora, pero el token se borra pase lo que pase: si la red falla, la
-   * sesion local igual debe terminar.
-   */
+  /* La pagina llega renderizada por el servidor, que es quien sabe si la cookie
+     sigue siendo valida. Si dice que no hay sesion, el token guardado sobra. */
+  function sincronizarConServidor() {
+    if (documento.body.getAttribute('data-sesion') === 'invitada' && obtenerToken()) {
+      cerrar();
+    }
+  }
+
   function cerrarSesion() {
     var terminar = function () {
       cerrar();
-      global.location.href = '/index.html';
+      global.location.href = '/';
     };
 
     if (global.Api && estaAutenticado()) {
@@ -84,10 +78,9 @@
     terminar();
   }
 
-  /** Redirige a login si la pagina exige sesion. Llamar desde paginas privadas. */
   function exigirSesion() {
     if (!estaAutenticado()) {
-      global.location.href = '/pages/login.html?requerida=1';
+      global.location.href = '/login?requerida=1&destino=' + encodeURIComponent(global.location.pathname);
       return false;
     }
 
@@ -95,16 +88,13 @@
   }
 
   function inicializar() {
+    sincronizarConServidor();
     aplicarInterfaz();
 
-    var botonSalir = documento.getElementById('logout-btn');
+    documento.querySelectorAll('[data-action="logout"]').forEach(function (boton) {
+      boton.addEventListener('click', cerrarSesion);
+    });
 
-    if (botonSalir) {
-      botonSalir.addEventListener('click', cerrarSesion);
-    }
-
-    // El menu movil vive en el encabezado compartido por todas las paginas,
-    // igual que los controles de sesion, por eso se conecta aqui (RNF-08).
     var botonMenu = documento.getElementById('mobile-menu-btn');
     var menu = documento.getElementById('mobile-menu');
 
