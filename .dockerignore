@@ -1,0 +1,9 @@
+node_modules/
+.git/
+.env
+.env.local
+logs/
+coverage/
+tests/
+docs/
+stitch_viaja_pro_platform/
