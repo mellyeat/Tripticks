@@ -126,8 +126,7 @@ Tripticks/
 ├── database/                  Scripts SQL de Supabase
 │   ├── schema.sql             Tablas, indices y triggers
 │   ├── policies.sql           Politicas de seguridad (RLS)
-│   ├── seed.sql               Datos de prueba
-│   └── backup.md              Procedimiento de respaldo
+│   └── seed.sql               Datos de prueba
 │
 ├── tests/
 │   ├── setup.js               Variables de entorno para el entorno de prueba
