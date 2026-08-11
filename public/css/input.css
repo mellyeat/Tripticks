@@ -132,6 +132,14 @@
     outline-offset: 2px;
   }
 
+  /* El preflight de Tailwind pone margin:0 en todo y eso anula el margin:auto
+     con el que el navegador centra un <dialog> abierto con showModal(). Sin
+     esta regla los dialogos de cancelar, eliminar y desactivar salen pegados
+     a la esquina superior izquierda. */
+  dialog:modal {
+    margin: auto;
+  }
+
   .material-symbols-outlined {
     font-family: "Material Symbols Outlined";
     font-weight: normal;

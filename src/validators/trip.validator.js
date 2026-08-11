@@ -4,6 +4,7 @@ const { body, param, query } = require('express-validator');
 
 const { ORDENES_VIAJE, PAGINACION } = require('../config/constants');
 const { esProduccion } = require('../config/env');
+const { sinMarcado } = require('./texto.validator');
 
 const FORMATO_FECHA = { format: 'YYYY-MM-DD', strictMode: true };
 
@@ -67,21 +68,24 @@ const reglasCrear = [
     .notEmpty()
     .withMessage('El titulo es obligatorio.')
     .isLength({ min: 5, max: 150 })
-    .withMessage('El titulo debe tener entre 5 y 150 caracteres.'),
+    .withMessage('El titulo debe tener entre 5 y 150 caracteres.')
+    .custom(sinMarcado),
 
   body('destino')
     .trim()
     .notEmpty()
     .withMessage('El destino es obligatorio.')
     .isLength({ min: 3, max: 120 })
-    .withMessage('El destino debe tener entre 3 y 120 caracteres.'),
+    .withMessage('El destino debe tener entre 3 y 120 caracteres.')
+    .custom(sinMarcado),
 
   body('descripcion')
     .trim()
     .notEmpty()
     .withMessage('La descripcion es obligatoria.')
     .isLength({ min: 20, max: 2000 })
-    .withMessage('La descripcion debe tener entre 20 y 2000 caracteres.'),
+    .withMessage('La descripcion debe tener entre 20 y 2000 caracteres.')
+    .custom(sinMarcado),
 
   body('itinerario')
     .optional()
@@ -97,14 +101,16 @@ const reglasCrear = [
     .notEmpty()
     .withMessage('Cada dia del itinerario necesita un titulo.')
     .isLength({ max: 150 })
-    .withMessage('El titulo de un dia del itinerario no puede pasar de 150 caracteres.'),
+    .withMessage('El titulo de un dia del itinerario no puede pasar de 150 caracteres.')
+    .custom(sinMarcado),
 
   body('itinerario.*.descripcion')
     .trim()
     .notEmpty()
     .withMessage('Cada dia del itinerario necesita una descripcion.')
     .isLength({ max: 1000 })
-    .withMessage('La descripcion de un dia del itinerario no puede pasar de 1000 caracteres.'),
+    .withMessage('La descripcion de un dia del itinerario no puede pasar de 1000 caracteres.')
+    .custom(sinMarcado),
 
   body('precio')
     .notEmpty()
@@ -155,19 +161,22 @@ const reglasActualizar = [
     .optional()
     .trim()
     .isLength({ min: 5, max: 150 })
-    .withMessage('El titulo debe tener entre 5 y 150 caracteres.'),
+    .withMessage('El titulo debe tener entre 5 y 150 caracteres.')
+    .custom(sinMarcado),
 
   body('destino')
     .optional()
     .trim()
     .isLength({ min: 3, max: 120 })
-    .withMessage('El destino debe tener entre 3 y 120 caracteres.'),
+    .withMessage('El destino debe tener entre 3 y 120 caracteres.')
+    .custom(sinMarcado),
 
   body('descripcion')
     .optional()
     .trim()
     .isLength({ min: 20, max: 2000 })
-    .withMessage('La descripcion debe tener entre 20 y 2000 caracteres.'),
+    .withMessage('La descripcion debe tener entre 20 y 2000 caracteres.')
+    .custom(sinMarcado),
 
   body('itinerario')
     .optional()
@@ -183,14 +192,16 @@ const reglasActualizar = [
     .notEmpty()
     .withMessage('Cada dia del itinerario necesita un titulo.')
     .isLength({ max: 150 })
-    .withMessage('El titulo de un dia del itinerario no puede pasar de 150 caracteres.'),
+    .withMessage('El titulo de un dia del itinerario no puede pasar de 150 caracteres.')
+    .custom(sinMarcado),
 
   body('itinerario.*.descripcion')
     .trim()
     .notEmpty()
     .withMessage('Cada dia del itinerario necesita una descripcion.')
     .isLength({ max: 1000 })
-    .withMessage('La descripcion de un dia del itinerario no puede pasar de 1000 caracteres.'),
+    .withMessage('La descripcion de un dia del itinerario no puede pasar de 1000 caracteres.')
+    .custom(sinMarcado),
 
   body('precio')
     .optional()

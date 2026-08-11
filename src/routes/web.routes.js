@@ -5,6 +5,8 @@ const express = require('express');
 const tripService = require('../services/trip.service');
 const asyncHandler = require('../utils/asyncHandler');
 const logger = require('../config/logger');
+const { reglasId } = require('../validators/trip.validator');
+const validar = require('../middlewares/validate.middleware');
 const { autenticacionOpcional } = require('../middlewares/auth.middleware');
 const {
   exponerUsuario,
@@ -13,7 +15,6 @@ const {
   soloInvitados,
 } = require('../middlewares/view.middleware');
 
-// La portada muestra tres viajes destacados y dos proximas salidas.
 const VIAJES_EN_PORTADA = 5;
 
 const router = express.Router();
@@ -21,9 +22,6 @@ const router = express.Router();
 router.use(autenticacionOpcional);
 router.use(exponerUsuario);
 
-/* La portada se arma en el servidor porque no tiene filtros ni paginacion: una
-   sola consulta y el HTML ya llega con los viajes. Si la base falla, la pagina
-   sigue en pie con las secciones vacias en lugar de devolver un error. */
 router.get('/', async (req, res) => {
   let viajes = [];
 
@@ -69,10 +67,10 @@ router.get('/admin', (req, res) => res.render('pages/admin/dashboard'));
 router.get('/admin/reports', (req, res) => res.render('pages/admin/reports'));
 router.get('/admin/trips', (req, res) => res.render('pages/admin/trips'));
 router.get('/admin/trips/new', (req, res) => res.render('pages/admin/trip-new'));
-// El formulario de edicion se rellena en el servidor: la vista ya conoce al
-// administrador y una consulta evita repetir el viaje en una llamada aparte.
 router.get(
   '/admin/trips/:id/edit',
+  reglasId,
+  validar,
   asyncHandler(async (req, res) => {
     const viaje = await tripService.obtenerDetalle(req.params.id);
 

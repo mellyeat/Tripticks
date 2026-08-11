@@ -70,7 +70,11 @@
       global.location.href = '/';
     };
 
-    if (global.Api && estaAutenticado()) {
+    /* La cookie de sesion es httpOnly: solo el servidor puede borrarla, y es la
+       que de verdad manda. Condicionar la llamada al token de localStorage
+       dejaba la cookie viva cuando ese espejo estaba vacio, y la sesion volvia
+       sola al recargar. Si ya no hay sesion, el 401 tambien termina en terminar. */
+    if (global.Api) {
       global.Api.post('/auth/logout').then(terminar, terminar);
       return;
     }

@@ -2,13 +2,16 @@
 
 const { body } = require('express-validator');
 
+const { sinMarcado } = require('./texto.validator');
+
 const reglasRegistro = [
   body('nombre')
     .trim()
     .notEmpty()
     .withMessage('El nombre es obligatorio.')
     .isLength({ min: 3, max: 100 })
-    .withMessage('El nombre debe tener entre 3 y 100 caracteres.'),
+    .withMessage('El nombre debe tener entre 3 y 100 caracteres.')
+    .custom(sinMarcado),
 
   body('email')
     .trim()

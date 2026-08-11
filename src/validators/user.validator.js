@@ -3,6 +3,7 @@
 const { body, param, query } = require('express-validator');
 
 const { ROLES, PAGINACION } = require('../config/constants');
+const { sinMarcado } = require('./texto.validator');
 
 const reglasId = [param('id').isUUID().withMessage('El identificador del usuario no es valido.')];
 
@@ -40,7 +41,8 @@ const reglasCrear = [
     .notEmpty()
     .withMessage('El nombre es obligatorio.')
     .isLength({ min: 3, max: 100 })
-    .withMessage('El nombre debe tener entre 3 y 100 caracteres.'),
+    .withMessage('El nombre debe tener entre 3 y 100 caracteres.')
+    .custom(sinMarcado),
 
   body('email')
     .trim()
@@ -80,7 +82,8 @@ const reglasActualizar = [
     .optional()
     .trim()
     .isLength({ min: 3, max: 100 })
-    .withMessage('El nombre debe tener entre 3 y 100 caracteres.'),
+    .withMessage('El nombre debe tener entre 3 y 100 caracteres.')
+    .custom(sinMarcado),
 
   body('email')
     .optional()

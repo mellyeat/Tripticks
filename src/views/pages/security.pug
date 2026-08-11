@@ -68,7 +68,7 @@ block contenido
             p(class="font-body-md text-body-md text-on-surface font-semibold flex items-center gap-2 flex-wrap")
               | Este dispositivo #[span(class="chip") ACTIVO]
             p(class="font-body-sm text-body-sm text-on-surface-variant", data-session="navegador") Navegador actual
-          button#logout-session-btn(type="button", class="link-danger") Cerrar sesion
+          button(type="button", data-action="logout", class="link-danger") Cerrar sesion
         p(class="font-body-sm text-body-sm text-on-surface-variant flex items-start gap-2")
           | #[span(class="material-symbols-outlined text-[18px] shrink-0", aria-hidden="true") info] El sistema autentica con tokens JWT sin estado, por lo que no lleva un registro de las sesiones abiertas en otros dispositivos. Para listarlas y cerrarlas de forma remota haria falta una tabla de sesiones en la base de datos.
   +piePagina()

@@ -145,6 +145,17 @@ describe('Inyeccion SQL en los campos de texto', () => {
     expect(respuesta.status).toBe(400);
     expect(tripModel.buscarPorId).not.toHaveBeenCalled();
   });
+
+  it('rechaza un identificador que no es uuid tambien en el formulario de edicion', async () => {
+    const token = tokenDe(ADMINISTRADOR);
+
+    const respuesta = await request(app)
+      .get("/admin/trips/1' or '1'='1/edit")
+      .set('Cookie', [`tripticks.token=${token}`]);
+
+    expect(respuesta.status).toBe(400);
+    expect(tripModel.buscarPorId).not.toHaveBeenCalled();
+  });
 });
 
 describe('Inyeccion de filtros de PostgREST', () => {
@@ -165,8 +176,7 @@ describe('Inyeccion de filtros de PostgREST', () => {
 
       const { busqueda } = userModel.listar.mock.calls[0][0].filtros;
 
-      // La busqueda se arma a mano dentro de un filtro "or", asi que la coma,
-      // los parentesis, el asterisco y los comodines tienen que desaparecer.
+      
       if (busqueda !== null) {
         expect(busqueda).not.toMatch(/[,()%_*"'\\]/);
       }
@@ -205,30 +215,83 @@ describe('Inyeccion de filtros de PostgREST', () => {
 });
 
 describe('XSS en los campos que despues se muestran', () => {
-  it('guarda el titulo del viaje como texto y no lo interpreta', async () => {
+  const VIAJE_VALIDO = {
+    titulo: 'Viaje de prueba',
+    destino: 'Oaxaca, Mexico',
+    descripcion: 'Una descripcion suficientemente larga para pasar la validacion.',
+    precio: 1000,
+    fecha_salida: '2030-01-10',
+    fecha_regreso: '2030-01-20',
+    cupos_totales: 10,
+    imagen_url: 'https://picsum.photos/seed/x/1200/800',
+  };
+
+ 
+  it('rechaza el marcado en los campos de texto del viaje sin llegar a la base', async () => {
     const token = tokenDe(ADMINISTRADOR);
-    tripModel.crear.mockImplementation(async (datos) => ({ id: 'x', ...datos }));
+
+    for (const campo of ['titulo', 'destino', 'descripcion']) {
+      for (const carga of CARGAS_XSS.filter((valor) => /<|javascript:/i.test(valor))) {
+        tripModel.crear.mockClear();
+
+        const respuesta = await request(app)
+          .post('/api/trips')
+          .set('Authorization', `Bearer ${token}`)
+          .send({ ...VIAJE_VALIDO, [campo]: `${VIAJE_VALIDO[campo]} ${carga}` });
+
+        expect(respuesta.status).toBe(400);
+        expect(tripModel.crear).not.toHaveBeenCalled();
+      }
+    }
+  });
+
+  it('rechaza el marcado en el nombre del registro sin crear la cuenta', async () => {
+    userModel.existeEmail.mockResolvedValue(false);
+
+    const respuesta = await request(app)
+      .post('/api/auth/register')
+      .send({
+        nombre: '<script>alert(1)</script>Ana',
+        email: 'ana.marcado@ejemplo.com',
+        password: 'Segura123',
+      });
+
+    expect(respuesta.status).toBe(400);
+    expect(userModel.crear).not.toHaveBeenCalled();
+  });
+
+  it('rechaza el marcado dentro de un dia del itinerario', async () => {
+    const token = tokenDe(ADMINISTRADOR);
 
     const respuesta = await request(app)
       .post('/api/trips')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        titulo: '<script>alert(1)</script>Viaje',
-        destino: 'Oaxaca, Mexico',
-        descripcion: 'Una descripcion suficientemente larga para pasar la validacion.',
-        precio: 1000,
-        fecha_salida: '2030-01-10',
-        fecha_regreso: '2030-01-20',
-        cupos_totales: 10,
-        imagen_url: 'https://picsum.photos/seed/x/1200/800',
+        ...VIAJE_VALIDO,
+        itinerario: [{ dia: 1, titulo: 'Llegada', descripcion: '<img src=x onerror=alert(1)>' }],
       });
 
-    expect(respuesta.status).toBe(201);
+    expect(respuesta.status).toBe(400);
+    expect(tripModel.crear).not.toHaveBeenCalled();
+  });
 
-    /* Se guarda tal cual, sin escapar. Es lo correcto: escapar al entrar
-       corrompe el dato y obliga a des-escapar en cada lectura. La defensa vive
-       en la salida, donde Pug escapa por omision y el frontend usa textContent. */
-    expect(tripModel.crear.mock.calls[0][0].titulo).toBe('<script>alert(1)</script>Viaje');
+  /* El filtro apunta a las etiquetas, no al caracter suelto: un "<" comparando
+     cantidades y un apostrofo en un apellido son texto legitimo y deben pasar.
+     Sin este caso, endurecer el patron mas adelante rompe usuarios reales sin
+     que ninguna prueba se queje. */
+  it('deja pasar el texto legitimo que contiene < o apostrofo', async () => {
+    const token = tokenDe(ADMINISTRADOR);
+    tripModel.crear.mockImplementation(async (datos) => ({ id: 'x', ...datos }));
+
+    const descripcion = "Grupos de < 10 personas. Incluye la ruta de O'Higgins y 5 < 8 paradas.";
+
+    const respuesta = await request(app)
+      .post('/api/trips')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...VIAJE_VALIDO, descripcion });
+
+    expect(respuesta.status).toBe(201);
+    expect(tripModel.crear.mock.calls[0][0].descripcion).toBe(descripcion);
   });
 
   it('devuelve el titulo en JSON sin convertirlo en HTML', async () => {

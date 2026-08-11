@@ -243,6 +243,21 @@ describe('Rutas protegidas (RNF-03, RF-17)', () => {
 
     expect(respuesta.status).toBe(200);
   });
+
+  /* El navegador no puede leer ni borrar la cookie de sesion: es httpOnly, asi
+     que cerrar sesion depende de que este endpoint la acepte y la limpie sin
+     que venga ningun encabezado Authorization. */
+  it('POST /api/auth/logout cierra la sesion solo con la cookie y la borra (RF-03)', async () => {
+    const token = await tokenValido();
+    userModel.buscarPorId.mockResolvedValue(USUARIO);
+
+    const respuesta = await request(app)
+      .post('/api/auth/logout')
+      .set('Cookie', `tripticks.token=${token}`);
+
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.headers['set-cookie'].join(';')).toMatch(/tripticks\.token=;/);
+  });
 });
 
 describe('Manejo de errores (RF-20)', () => {
