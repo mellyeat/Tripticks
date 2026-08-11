@@ -1,0 +1,110 @@
+extends ../layouts/base.pug
+
+block variables
+  - var titulo = 'Confirmar reservacion - TripTicks'
+  - var descripcion = 'Confirma tu reservacion en TripTicks.'
+  - var clasesBody = 'bg-off-white text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col'
+  - var scriptsVista = ['/js/reservations.js']
+  - var noIndexar = true
+
+block contenido
+  header(class="w-full py-6 px-margin-mobile md:px-margin-desktop bg-surface-container-lowest border-b border-surface-variant flex items-center justify-between sticky top-0 z-10")
+    //- reservations.js reapunta el enlace al viaje en cuanto lee ?viaje= de la URL.
+    | #[a#back-link(href="/trips", class="flex items-center text-on-surface-variant hover:text-primary transition-colors group") #[span(class="material-symbols-outlined mr-2 group-hover:-translate-x-1 transition-transform", aria-hidden="true") arrow_back] #[span(class="font-label-caps text-label-caps") VOLVER]] #[span(class="font-display-lg text-display-lg-mobile md:text-display-lg text-deep-teal") TripTicks]
+    div(class="w-20", aria-hidden="true")
+  main(class="grow pt-12 pb-24 px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto")
+    nav(class="w-full max-w-2xl mx-auto mb-16", aria-label="Progreso de la reservacion")
+      ol(class="flex items-center justify-between relative")
+        li(class="absolute left-0 top-4 w-full h-0.5 bg-surface-variant -z-10", aria-hidden="true")
+        li(class="absolute left-0 top-4 w-1/2 h-0.5 bg-primary -z-10", aria-hidden="true")
+        li(class="flex flex-col items-center")
+          | #[span(class="step-dot step-dot-done") #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") check]] #[span(class="font-label-caps text-label-caps text-primary") Resumen]
+        li(class="flex flex-col items-center")
+          | #[span(class="step-dot step-dot-active", aria-current="step") 2] #[span(class="font-label-caps text-label-caps text-primary") Pago]
+        li(class="flex flex-col items-center")
+          | #[span(class="step-dot") 3] #[span(class="font-label-caps text-label-caps text-on-surface-variant") Confirmacion]
+    div#checkout-error(class="hidden alert-error max-w-2xl mx-auto mb-8", role="alert")
+      | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#checkout-error-message]
+    div(class="grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-16")
+      div(class="lg:col-span-7 space-y-12")
+        section(aria-labelledby="pasajero-titulo")
+          h1#pasajero-titulo(class="font-headline-md text-headline-md text-deep-teal mb-6") Detalles del pasajero
+          dl(class="bg-surface-container-lowest p-6 rounded-xl ambient-shadow grid grid-cols-1 md:grid-cols-2 gap-6")
+            div
+              dt(class="font-label-caps text-label-caps text-on-surface-variant mb-2") NOMBRE COMPLETO
+              dd(class="font-body-lg text-body-lg text-on-surface", data-user="nombre")= usuario.nombre
+            div
+              dt(class="font-label-caps text-label-caps text-on-surface-variant mb-2") CORREO ELECTRONICO
+              dd(class="font-body-lg text-body-lg text-on-surface", data-user="correo")= usuario.email
+          p(class="mt-3 font-body-sm text-body-sm text-on-surface-variant flex items-start gap-2")
+            | #[span(class="material-symbols-outlined text-[18px]", aria-hidden="true") info] Estos datos provienen de tu cuenta. Para modificarlos, edita tu perfil.
+        section(aria-labelledby="pago-titulo")
+          h2#pago-titulo(class="font-headline-md text-headline-md text-deep-teal mb-6") Metodo de pago
+          div(class="alert-warning mb-6")
+            | #[span(class="material-symbols-outlined", aria-hidden="true") science] #[span #[strong Demostracion.] Esta pantalla simula el proceso de pago: los datos no se envian ni se almacenan en ningun lado. No escribas informacion real de tu tarjeta.]
+          div(class="space-y-4")
+            label(class="block cursor-pointer")
+              input(type="radio", name="metodo_pago", value="tarjeta", class="sr-only", checked)
+              div(class="option-card")
+                div(class="flex items-center justify-between mb-6")
+                  div(class="flex items-center gap-3")
+                    | #[span(class="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center shrink-0", aria-hidden="true") #[span(class="w-2.5 h-2.5 rounded-full bg-primary")]] #[span(class="font-headline-sm text-body-lg font-semibold text-on-surface") Tarjeta de credito]
+                  span(class="material-symbols-outlined text-on-surface-variant", aria-hidden="true") credit_card
+                div(class="space-y-4")
+                  div
+                    label(for="card-number", class="field-label") NUMERO DE TARJETA
+                    input#card-number(type="text", inputmode="numeric", autocomplete="off", placeholder="0000 0000 0000 0000", class="field bg-surface-container-lowest p-4")
+                  div(class="grid grid-cols-2 gap-4")
+                    div
+                      label(for="card-exp", class="field-label") FECHA EXP.
+                      input#card-exp(type="text", inputmode="numeric", autocomplete="off", placeholder="MM/AA", class="field bg-surface-container-lowest p-4")
+                    div
+                      label(for="card-cvc", class="field-label") CVC
+                      input#card-cvc(type="text", inputmode="numeric", autocomplete="off", placeholder="123", class="field bg-surface-container-lowest p-4")
+                  div
+                    label(for="card-name", class="field-label") NOMBRE EN LA TARJETA
+                    input#card-name(type="text", autocomplete="off", placeholder="Como aparece en la tarjeta", class="field bg-surface-container-lowest p-4")
+            label(class="block cursor-pointer")
+              input(type="radio", name="metodo_pago", value="paypal", class="sr-only")
+              div(class="option-card")
+                div(class="flex items-center justify-between")
+                  div(class="flex items-center gap-3")
+                    | #[span(class="w-5 h-5 rounded-full border-2 border-outline-variant shrink-0", aria-hidden="true")] #[span(class="font-headline-sm text-body-lg font-semibold text-on-surface") PayPal]
+                  span(class="material-symbols-outlined text-on-surface-variant", aria-hidden="true") account_balance_wallet
+      div(class="lg:col-span-5")
+        div(class="bg-surface-container-lowest rounded-xl ambient-shadow overflow-hidden lg:sticky lg:top-32")
+          div(class="h-48 w-full relative")
+            img(alt="", data-trip="imagen", class="w-full h-full object-cover")
+            div(class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent")
+            div(class="absolute bottom-4 left-4 right-4")
+              span(class="chip mb-2", data-trip="destino")
+              h2(class="font-headline-sm text-headline-sm text-white", data-trip="titulo")
+          div(class="p-6 md:p-8")
+            div(class="space-y-4 mb-8 border-b border-surface-variant pb-8")
+              div(class="flex items-start gap-3")
+                span(class="material-symbols-outlined text-warm-gray", aria-hidden="true") calendar_today
+                div
+                  p(class="font-body-md text-body-md text-on-surface font-semibold", data-trip="fechas")
+                  p(class="font-body-sm text-body-sm text-on-surface-variant", data-trip="duracion")
+              div(class="flex items-start gap-3")
+                span(class="material-symbols-outlined text-warm-gray", aria-hidden="true") event_seat
+                div
+                  p(class="font-body-md text-body-md text-on-surface font-semibold") 1 lugar
+                  p(class="font-body-sm text-body-sm text-on-surface-variant")
+                    | Quedan #[span(data-trip="cupos")] cupos disponibles
+            h3(class="font-headline-sm text-body-lg font-semibold text-deep-teal mb-4") Resumen de precio
+            dl(class="space-y-3 font-body-md text-body-md text-on-surface-variant mb-6")
+              div(class="flex justify-between gap-4")
+                dt Viaje (1 lugar)
+                dd(data-checkout="subtotal")
+              div(class="flex justify-between gap-4")
+                dt Impuestos y tasas (16%)
+                dd(data-checkout="impuestos")
+            div(class="flex justify-between items-center border-t border-surface-variant pt-6 mb-8 gap-4")
+              | #[span(class="font-headline-md text-headline-sm text-on-surface") Total] #[span(class="font-headline-md text-headline-md text-deep-teal", data-checkout="total")]
+            button#confirm-reservation-btn(type="button", class="btn-primary w-full text-body-md font-semibold py-4 rounded-xl")
+              | Confirmar reservacion #[span(class="material-symbols-outlined", aria-hidden="true") arrow_forward]
+            p(class="font-body-sm text-body-sm text-center text-on-surface-variant mt-4")
+              | Al confirmar se aparta 1 lugar a tu nombre. Puedes cancelarlo despues desde #[a(href="/reservations", class="underline hover:text-primary") Mis reservaciones].
+  footer(class="py-8 text-center border-t border-surface-variant bg-surface-container-lowest")
+    p(class="font-body-sm text-body-sm text-on-surface-variant") &copy; 2026 TripTicks. Sistema de reservacion de viajes.

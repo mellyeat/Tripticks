@@ -1,0 +1,42 @@
+extends ../layouts/base.pug
+
+block variables
+  - var titulo = 'Reserva confirmada - TripTicks'
+  - var descripcion = 'Tu reservacion en TripTicks quedo registrada.'
+  - var clasesBody = 'bg-surface-container-low text-on-surface font-body-md text-body-md antialiased min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-desktop'
+  - var scriptsVista = ['/js/reservations.js']
+  - var noIndexar = true
+
+block contenido
+  main(class="w-full max-w-5xl bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/20 overflow-hidden flex flex-col md:flex-row relative")
+    div(class="absolute top-0 right-0 w-64 h-64 bg-primary-fixed-dim/20 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none", aria-hidden="true")
+    div(class="md:w-5/12 relative h-64 md:h-auto")
+      img(alt="", data-trip="imagen", class="absolute inset-0 w-full h-full object-cover")
+      div(class="absolute bottom-6 left-6 right-6 p-4 rounded-lg bg-surface/40 backdrop-blur-md border border-surface/50 flex items-center gap-4")
+        span(class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-sm")
+          span(class="material-symbols-outlined is-filled text-on-primary", aria-hidden="true") sailing
+        div
+          p(class="font-label-caps text-label-caps text-on-surface-variant") TRIPTICKS
+          p(class="font-body-sm text-body-sm text-on-surface font-semibold") Reservacion registrada
+    div(class="md:w-7/12 p-8 md:p-12 lg:p-16 flex flex-col justify-center relative z-10")
+      div(class="mb-8 animate-fade-up")
+        span(class="w-16 h-16 rounded-full bg-primary-fixed/30 flex items-center justify-center mb-6")
+          span(class="material-symbols-outlined is-filled text-primary text-[40px]", aria-hidden="true") check_circle
+        h1(class="font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-4") Reserva confirmada
+        p(class="font-body-lg text-body-lg text-on-surface-variant")
+          | Tu lugar quedo apartado. Puedes consultar o cancelar esta reservacion en cualquier momento desde #[strong(class="text-on-surface") Mis reservaciones].
+      dl(class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10")
+        div(class="bg-surface p-5 rounded-lg border border-outline-variant/30 hover:shadow-sm transition-shadow")
+          dt(class="font-label-caps text-label-caps text-on-surface-variant mb-1") NO. DE RESERVA
+          dd(class="font-headline-sm text-headline-sm text-deep-teal", data-reservation="folio")
+        div(class="bg-surface p-5 rounded-lg border border-outline-variant/30 hover:shadow-sm transition-shadow")
+          dt(class="font-label-caps text-label-caps text-on-surface-variant mb-1") FECHAS
+          dd(class="flex items-center gap-2")
+            | #[span(class="material-symbols-outlined text-outline text-[16px]", aria-hidden="true") calendar_today] #[span(class="font-body-md text-body-md text-on-surface font-semibold", data-trip="fechas")]
+        div(class="bg-warm-sand/30 p-5 rounded-lg border border-warm-sand/50 sm:col-span-2 flex items-center gap-4 hover:shadow-sm transition-shadow")
+          span(class="material-symbols-outlined is-filled text-secondary text-[32px]", aria-hidden="true") location_on
+          div
+            dt(class="font-label-caps text-label-caps text-on-surface-variant mb-1") DESTINO
+            dd(class="font-headline-sm text-headline-sm text-on-surface", data-trip="titulo")
+      div(class="flex flex-col sm:flex-row gap-4 mt-auto")
+        | #[a(href="/trips", class="btn-primary flex-1 py-4 text-body-md font-semibold") #[span(class="material-symbols-outlined", aria-hidden="true") explore] Volver al catalogo] #[a(href="/reservations", class="flex-1 py-4 px-6 rounded-lg bg-surface-container text-on-surface border border-outline-variant font-body-md text-body-md font-semibold inline-flex items-center justify-center gap-2 hover:bg-surface-container-high transition-all duration-200 active:scale-95") #[span(class="material-symbols-outlined", aria-hidden="true") receipt_long] Mis reservaciones]
