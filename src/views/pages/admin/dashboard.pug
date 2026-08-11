@@ -1,0 +1,106 @@
+extends ../../layouts/base.pug
+
+block variables
+  - var titulo = 'Panel de administracion - TripTicks'
+  - var descripcion = 'Panel de administracion de TripTicks: metricas de usuarios, viajes y reservaciones.'
+  - var clasesBody = 'bg-off-white text-on-surface font-body-md text-body-md antialiased min-h-screen'
+  - var scriptsVista = ['/js/admin/dashboard.js']
+
+block contenido
+  +consolaAdmin("dashboard")
+  main(class="md:ml-64 flex flex-col min-h-screen")
+    +barraAdmin()
+    div(class="flex-1 p-margin-mobile md:p-margin-desktop space-y-8")
+      section(class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4")
+        div
+          h1(class="font-headline-md text-headline-md text-on-surface mb-2")
+            | Hola, #[span(data-user="nombre")= usuario ? usuario.nombre : ""]
+          p(class="font-body-lg text-body-lg text-warm-gray") Este es el estado de TripTicks hoy.
+        a(href="/admin/reports", class="btn-secondary w-full md:w-auto")
+          | #[span(class="material-symbols-outlined text-xl", aria-hidden="true") bar_chart] Ver reporte mensual
+
+      div#dashboard-error(class="hidden alert-error", role="alert")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#dashboard-error-message]
+
+      //-
+        Metricas de RF-16: total de usuarios, de viajes, de reservaciones
+        y el viaje con mayor demanda.
+      section(class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter", aria-label="Metricas generales")
+        article(class="stat-card")
+          div(class="flex justify-between items-start mb-4")
+            span(class="stat-icon bg-deep-teal/10 text-deep-teal")
+              span(class="material-symbols-outlined", aria-hidden="true") group
+          p(class="font-body-sm text-body-sm text-warm-gray mb-1") Total de usuarios
+          p(class="font-headline-sm text-headline-sm font-bold text-on-surface", data-stat="usuarios") --
+        article(class="stat-card")
+          div(class="flex justify-between items-start mb-4")
+            span(class="stat-icon bg-soft-terracota/10 text-soft-terracota")
+              span(class="material-symbols-outlined", aria-hidden="true") explore
+          p(class="font-body-sm text-body-sm text-warm-gray mb-1") Total de viajes
+          p(class="font-headline-sm text-headline-sm font-bold text-on-surface", data-stat="viajes") --
+        article(class="stat-card")
+          div(class="flex justify-between items-start mb-4")
+            span(class="stat-icon bg-primary-container/10 text-deep-teal")
+              span(class="material-symbols-outlined", aria-hidden="true") receipt_long
+          p(class="font-body-sm text-body-sm text-warm-gray mb-1") Total de reservaciones
+          p(class="font-headline-sm text-headline-sm font-bold text-on-surface", data-stat="reservaciones") --
+        article(class="stat-card")
+          div(class="flex justify-between items-start mb-4")
+            | #[span(class="stat-icon bg-secondary/10 text-secondary") #[span(class="material-symbols-outlined", aria-hidden="true") local_fire_department]] #[span(class="font-body-sm text-body-sm text-warm-gray", data-stat="demanda-conteo")]
+          p(class="font-body-sm text-body-sm text-warm-gray mb-1") Viaje con mayor demanda
+          p(class="font-headline-sm text-headline-sm font-bold text-on-surface", data-stat="demanda-titulo") --
+
+      section(class="grid grid-cols-1 lg:grid-cols-3 gap-gutter")
+        //-
+          "Viajes con mayor demanda" (RF-16). Las barras son divs con la
+          altura en porcentaje respecto al viaje mas reservado; no hace
+          falta ninguna libreria de graficas.
+        div(class="lg:col-span-2 panel flex flex-col")
+          div(class="flex justify-between items-center mb-6 gap-4")
+            h2(class="font-headline-sm text-headline-sm text-on-surface") Viajes con mayor demanda
+          div(class="flex-1 flex flex-col rounded-lg border border-outline-variant/30 bg-surface-container-lowest p-4")
+            div#demand-chart(class="flex items-end justify-between gap-3 flex-1 min-h-56", role="img", aria-label="Reservaciones activas por viaje")
+            ul#demand-labels(class="flex items-start justify-between gap-3 mt-3 text-center")
+            p#demand-empty(class="hidden text-center py-12 font-body-md text-body-md text-warm-gray")
+              | Todavia no hay reservaciones que medir.
+
+        div(class="panel flex flex-col gap-4")
+          h2(class="font-headline-sm text-headline-sm text-on-surface mb-2") Accesos rapidos
+          | #[a(href="/admin/users", class="w-full flex items-center justify-between gap-3 p-4 rounded-lg group transition-all bg-surface-container-lowest border border-outline-variant/50 hover:border-deep-teal hover:shadow-sm") #[span(class="flex items-center gap-3") #[span(class="stat-icon bg-warm-sand text-deep-teal transition-colors group-hover:bg-deep-teal group-hover:text-white") #[span(class="material-symbols-outlined text-xl", aria-hidden="true") manage_accounts]] #[span(class="font-body-md text-body-md font-semibold text-on-surface") Gestionar usuarios]] #[span(class="material-symbols-outlined text-warm-gray", aria-hidden="true") chevron_right]] #[a(href="/admin/trips/new", class="w-full flex items-center justify-between gap-3 p-4 rounded-lg group transition-all bg-surface-container-lowest border border-outline-variant/50 hover:border-deep-teal hover:shadow-sm") #[span(class="flex items-center gap-3") #[span(class="stat-icon bg-warm-sand text-deep-teal transition-colors group-hover:bg-deep-teal group-hover:text-white") #[span(class="material-symbols-outlined text-xl", aria-hidden="true") add_location_alt]] #[span(class="font-body-md text-body-md font-semibold text-on-surface") Crear viaje]] #[span(class="material-symbols-outlined text-warm-gray", aria-hidden="true") chevron_right]] #[a(href="/admin/reservations", class="w-full flex items-center justify-between gap-3 p-4 rounded-lg group transition-all bg-surface-container-lowest border border-outline-variant/50 hover:border-deep-teal hover:shadow-sm") #[span(class="flex items-center gap-3") #[span(class="stat-icon bg-warm-sand text-deep-teal transition-colors group-hover:bg-deep-teal group-hover:text-white") #[span(class="material-symbols-outlined text-xl", aria-hidden="true") receipt_long]] #[span(class="font-body-md text-body-md font-semibold text-on-surface") Ver reservaciones]] #[span(class="material-symbols-outlined text-warm-gray", aria-hidden="true") chevron_right]]
+          div(class="mt-auto pt-4 rounded-lg bg-surface-container-lowest border border-outline-variant/50 p-4")
+            p(class="font-label-caps text-label-caps text-warm-gray mb-1") INGRESOS REGISTRADOS
+            p(class="font-headline-sm text-headline-sm font-bold text-deep-teal", data-stat="ingresos") --
+            p(class="font-body-sm text-body-sm text-warm-gray mt-1") Suma de las reservaciones no canceladas.
+
+      section(class="card", aria-labelledby="recientes-titulo")
+        div(class="p-6 border-b border-outline-variant/30 flex justify-between items-center gap-4")
+          h2#recientes-titulo(class="font-headline-sm text-headline-sm text-on-surface") Reservaciones recientes
+          a(href="/admin/reservations", class="font-body-sm text-body-sm font-semibold text-deep-teal hover:underline") Ver todas
+        div(class="overflow-x-auto")
+          table(class="w-full border-collapse")
+            thead
+              tr(class="bg-surface-container-low border-b border-outline-variant/30")
+                th(scope="col", class="admin-th") Cliente
+                th(scope="col", class="admin-th") Viaje
+                th(scope="col", class="admin-th hidden sm:table-cell") Fecha
+                th(scope="col", class="admin-th") Total
+                th(scope="col", class="admin-th") Estado
+                th(scope="col", class="admin-th")
+                  span(class="sr-only") Acciones
+            tbody#recent-body(class="divide-y divide-outline-variant/20")
+        p#recent-empty(class="hidden text-center py-12 font-body-md text-body-md text-warm-gray")
+          | Todavia no hay reservaciones registradas.
+
+  template#recent-row-template
+    tr(class="admin-row")
+      td(class="admin-td")
+        div(class="flex items-center gap-3")
+          | #[span(class="avatar-initials w-8 h-8 text-xs", aria-hidden="true", data-cell="iniciales")] #[span #[span(class="block font-semibold text-on-surface", data-cell="cliente")] #[span(class="block text-warm-gray text-xs", data-cell="folio")]]
+      td(class="admin-td text-warm-gray", data-cell="viaje")
+      td(class="admin-td text-warm-gray hidden sm:table-cell", data-cell="fecha")
+      td(class="admin-td font-medium text-on-surface", data-cell="total")
+      td(class="admin-td")
+        span(data-cell="estado")
+      td(class="admin-td text-right")
+        a(class="icon-btn border-transparent shadow-none", data-cell="detalle-link", aria-label="Ver la reservacion")
+          span(class="material-symbols-outlined", aria-hidden="true") chevron_right

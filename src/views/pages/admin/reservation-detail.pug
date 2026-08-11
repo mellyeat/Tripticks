@@ -1,0 +1,123 @@
+extends ../../layouts/base.pug
+
+block variables
+  - var titulo = 'Detalle de reservacion - TripTicks'
+  - var descripcion = 'Detalle de una reservacion registrada en TripTicks.'
+  - var clasesBody = 'bg-off-white text-on-surface font-body-md text-body-md antialiased min-h-screen'
+  - var scriptsVista = ['/js/admin/reservations.js']
+
+block contenido
+  +consolaAdmin("reservaciones")
+  main(class="md:ml-64 flex flex-col min-h-screen")
+    +barraAdmin()
+    div(class="flex-1 p-margin-mobile md:p-margin-desktop space-y-8")
+      section(class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4")
+        div
+          h1(class="font-headline-md text-headline-md text-deep-teal mb-2")
+            | Reservacion #[span(data-detail="folio")]
+          p(class="font-body-lg text-body-lg text-warm-gray")
+            | Registrada el #[span(data-detail="creada")].
+        div(class="flex flex-wrap gap-3 w-full lg:w-auto")
+          a(href="/admin/reservations", class="btn-secondary")
+            | #[span(class="material-symbols-outlined text-xl", aria-hidden="true") arrow_back] Volver al listado
+          button#cambiar-estado-btn(type="button", class="btn-primary")
+            | #[span(class="material-symbols-outlined text-xl", aria-hidden="true") published_with_changes] Cambiar estado
+
+      div#detail-error(class="hidden alert-error", role="alert")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#detail-error-message]
+
+      //-
+        Franja de estado: las tres columnas de reservaciones que resumen el
+        folio (creado_en, estado y metodo_pago).
+      section(class="panel", aria-label="Estado de la reservacion")
+        dl(class="grid grid-cols-1 sm:grid-cols-3 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-outline-variant/40")
+          div(class="sm:pr-6")
+            dt(class="font-label-caps text-label-caps text-warm-gray mb-2") FECHA DE RESERVA
+            dd(class="font-body-lg text-body-lg text-on-surface", data-detail="creada")
+          div(class="pt-6 sm:pt-0 sm:px-6")
+            dt(class="font-label-caps text-label-caps text-warm-gray mb-2") ESTADO
+            dd
+              span(data-detail="estado")
+          div(class="pt-6 sm:pt-0 sm:pl-6")
+            dt(class="font-label-caps text-label-caps text-warm-gray mb-2") METODO DE PAGO
+            dd(class="flex items-center gap-2 font-body-lg text-body-lg text-on-surface")
+              | #[span(class="material-symbols-outlined text-warm-gray", aria-hidden="true") credit_card] #[span(data-detail="metodo")]
+
+      div(class="grid grid-cols-1 lg:grid-cols-3 gap-gutter items-start")
+        div(class="lg:col-span-2 space-y-8")
+          section(class="panel", aria-labelledby="cliente-titulo")
+            h2#cliente-titulo(class="panel-title")
+              | #[span(class="material-symbols-outlined", aria-hidden="true") person] Cliente
+            dl(class="grid grid-cols-1 sm:grid-cols-2 gap-6 grow")
+              div
+                dt(class="font-label-caps text-label-caps text-warm-gray mb-1") NOMBRE
+                dd(class="font-body-md text-body-md text-on-surface", data-detail="cliente")
+              div
+                dt(class="font-label-caps text-label-caps text-warm-gray mb-1") CORREO
+                dd(class="font-body-md text-body-md text-on-surface break-all", data-detail="email")
+            p(class="form-hint mt-6")
+              | #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") info] La tabla #[code usuarios] solo guarda nombre, correo, rol y estado.
+
+          section(class="card", aria-labelledby="viaje-titulo")
+            div(class="relative h-48")
+              img(data-detail="imagen", alt="", class="absolute inset-0 w-full h-full object-cover")
+              div(class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent")
+              div(class="absolute bottom-0 left-0 p-6 text-white")
+                h2#viaje-titulo(class="font-headline-sm text-headline-sm mb-1", data-detail="viaje")
+                p(class="flex items-center gap-1 font-body-sm text-body-sm")
+                  | #[span(class="material-symbols-outlined text-lg", aria-hidden="true") location_on] #[span(data-detail="destino")]
+            dl(class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6")
+              div
+                dt(class="font-label-caps text-label-caps text-warm-gray mb-1") FECHAS
+                dd(class="font-body-md text-body-md text-on-surface", data-detail="fechas")
+              div
+                dt(class="font-label-caps text-label-caps text-warm-gray mb-1") DURACION
+                dd(class="font-body-md text-body-md text-on-surface", data-detail="duracion")
+
+        //-
+          Resumen financiero. Las tres cifras son las columnas
+          precio_unitario, impuestos y total: no hay conceptos extra ni
+          desglose por partidas en el esquema.
+        aside(class="panel lg:sticky lg:top-24", aria-labelledby="finanzas-titulo")
+          h2#finanzas-titulo(class="panel-title")
+            | #[span(class="material-symbols-outlined", aria-hidden="true") payments] Resumen financiero
+          dl(class="space-y-4")
+            div(class="flex justify-between gap-4 font-body-md text-body-md")
+              dt(class="text-on-surface-variant") Precio por persona
+              dd(class="text-on-surface", data-detail="precio")
+            div(class="flex justify-between gap-4 font-body-md text-body-md")
+              dt(class="text-on-surface-variant") Impuestos y tasas (16%)
+              dd(class="text-on-surface", data-detail="impuestos")
+            div(class="flex justify-between gap-4 pt-4 border-t border-outline-variant/50")
+              dt(class="font-headline-sm text-headline-sm text-deep-teal") Total
+              dd(class="font-headline-sm text-headline-sm text-deep-teal", data-detail="total")
+          div(class="mt-8 pt-6 border-t border-outline-variant/50")
+            p(class="font-label-caps text-label-caps text-warm-gray mb-3") METODO DE PAGO
+            div(class="flex items-center gap-3 p-4 rounded-lg bg-surface-container-low")
+              span(class="material-symbols-outlined text-deep-teal", aria-hidden="true") credit_card
+              div
+                p(class="font-body-md text-body-md text-on-surface", data-detail="metodo")
+                p(class="font-body-sm text-body-sm text-warm-gray") El esquema no guarda datos de la tarjeta.
+
+  dialog#estado-dialog(class="rounded-xl p-0 backdrop:bg-primary/40 backdrop:backdrop-blur-sm max-w-md w-[calc(100%-2rem)]")
+    form#estado-form(class="bg-surface-container-lowest p-6 md:p-8", novalidate)
+      h2(class="font-headline-sm text-headline-sm text-primary mb-3") Cambiar el estado
+      p(class="font-body-md text-body-md text-on-surface-variant mb-6")
+        | Reservacion #[strong(class="text-on-surface", data-cell="folio")]. Cancelarla libera el lugar en el viaje y no se puede revertir.
+
+      div#estado-error(class="hidden alert-error mb-4", role="alert")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#estado-error-message]
+
+      div(class="mb-8")
+        label(for="nuevo-estado", class="field-label") NUEVO ESTADO
+        div(class="relative")
+          select#nuevo-estado(name="estado", class="field-select")
+            option(value="activa") Activa
+            option(value="completada") Completada
+            option(value="cancelada") Cancelada
+          span(class="field-select-icon")
+            span(class="material-symbols-outlined", aria-hidden="true") expand_more
+
+      div(class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3")
+        button#estado-cancel-btn(type="button", class="btn-ghost") Cancelar
+        button(type="submit", class="btn-primary") Guardar

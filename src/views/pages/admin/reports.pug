@@ -1,0 +1,81 @@
+extends ../../layouts/base.pug
+
+block variables
+  - var titulo = 'Reporte general - TripTicks'
+  - var descripcion = 'Reporte de reservaciones e ingresos registrados en TripTicks.'
+  - var clasesBody = 'bg-off-white text-on-surface font-body-md text-body-md antialiased min-h-screen'
+  - var scriptsVista = ['/js/admin/dashboard.js']
+
+block contenido
+  +consolaAdmin("dashboard")
+  main(class="md:ml-64 flex flex-col min-h-screen")
+    +barraAdmin()
+    div(class="flex-1 p-margin-mobile md:p-margin-desktop space-y-8")
+      section(class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 pb-6 border-b border-outline-variant/40")
+        div
+          p(class="font-label-caps text-label-caps text-soft-terracota mb-2") DESEMPENO ACUMULADO
+          h1(class="font-headline-md text-headline-md text-deep-teal") Reporte general
+        a(href="/admin", class="btn-secondary w-full lg:w-auto")
+          | #[span(class="material-symbols-outlined text-xl", aria-hidden="true") dashboard] Volver al panel
+
+      div#dashboard-error(class="hidden alert-error", role="alert")
+        | #[span(class="material-symbols-outlined", aria-hidden="true") error] #[span#dashboard-error-message]
+
+      //-
+        Todas las cifras salen de GET /api/dashboard, que las calcula sobre
+        "reservaciones" y "viajes". No hay corte por mes ni desglose por
+        metodo de pago porque el endpoint no los agrega: seria otra consulta.
+      p(class="font-body-md text-body-md text-warm-gray")
+        | Cifras acumuladas de todo el historico, calculadas en el momento de abrir la pagina.
+
+      section(class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter", aria-label="Indicadores generales")
+        article(class="stat-card")
+          div(class="flex justify-between items-start mb-4")
+            span(class="stat-icon bg-deep-teal/10 text-deep-teal")
+              span(class="material-symbols-outlined", aria-hidden="true") payments
+          p(class="font-body-sm text-body-sm text-warm-gray mb-1") Ingresos registrados
+          p(class="font-headline-sm text-headline-sm font-bold text-on-surface", data-stat="ingresos") --
+        article(class="stat-card")
+          div(class="flex justify-between items-start mb-4")
+            span(class="stat-icon bg-soft-terracota/10 text-soft-terracota")
+              span(class="material-symbols-outlined", aria-hidden="true") confirmation_number
+          p(class="font-body-sm text-body-sm text-warm-gray mb-1") Reservaciones totales
+          p(class="font-headline-sm text-headline-sm font-bold text-on-surface", data-stat="reservaciones") --
+        article(class="stat-card")
+          div(class="flex justify-between items-start mb-4")
+            span(class="stat-icon bg-warm-sand text-deep-teal")
+              span(class="material-symbols-outlined", aria-hidden="true") show_chart
+          p(class="font-body-sm text-body-sm text-warm-gray mb-1") Valor promedio por reserva
+          p(class="font-headline-sm text-headline-sm font-bold text-on-surface", data-stat="promedio") --
+        article(class="stat-card")
+          div(class="flex justify-between items-start mb-4")
+            span(class="stat-icon bg-tertiary-fixed text-deep-teal")
+              span(class="material-symbols-outlined", aria-hidden="true") event_available
+          p(class="font-body-sm text-body-sm text-warm-gray mb-1") Reservaciones activas
+          p(class="font-headline-sm text-headline-sm font-bold text-on-surface", data-stat="activas") --
+
+      //-
+        El mockup traia "Viajes mas rentables", pero el endpoint no agrega el
+        importe por viaje: se ordena por reservaciones activas, que es lo que
+        si devuelve, y se acompana de la ocupacion de cada salida.
+      section(class="card", aria-labelledby="demanda-titulo")
+        div(class="p-6 border-b border-outline-variant/30")
+          h2#demanda-titulo(class="font-headline-sm text-headline-sm text-on-surface") Viajes con mayor demanda
+        div(class="overflow-x-auto")
+          table(class="w-full border-collapse")
+            thead
+              tr(class="bg-surface-container-low border-b border-outline-variant/30")
+                th(scope="col", class="admin-th") Viaje
+                th(scope="col", class="admin-th") Destino
+                th(scope="col", class="admin-th") Reservaciones activas
+                th(scope="col", class="admin-th text-right") Ocupacion
+            tbody#report-body(class="divide-y divide-outline-variant/20")
+        p#report-empty(class="hidden text-center py-12 font-body-md text-body-md text-warm-gray")
+          | Todavia no hay reservaciones registradas.
+
+  template#report-row-template
+    tr(class="admin-row")
+      td(class="admin-td font-semibold text-deep-teal", data-cell="titulo")
+      td(class="admin-td text-warm-gray", data-cell="destino")
+      td(class="admin-td text-warm-gray", data-cell="reservaciones")
+      td(class="admin-td text-right font-medium text-on-surface", data-cell="ocupacion")
