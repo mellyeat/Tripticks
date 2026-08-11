@@ -61,6 +61,11 @@ async function iniciarSesion({ email, password: passwordPlano }) {
   // Mismo mensaje para "no existe" y "contrasena incorrecta": distinguirlos
   // permitiria averiguar que correos estan registrados.
   if (!usuario) {
+    // Mismo mensaje no basta: responder al instante aqui delataria, por el
+    // tiempo de respuesta, que el correo no esta registrado. Se compara contra
+    // un hash de descarte para gastar lo mismo que un login real.
+    await password.verificarInexistente(passwordPlano);
+
     logger.advertencia('Intento de login con correo inexistente', { email: emailNormalizado });
     throw ApiError.noAutenticado(MENSAJES.CREDENCIALES_INVALIDAS);
   }
