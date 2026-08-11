@@ -1,19 +1,11 @@
-// Error de aplicacion con codigo HTTP, distinguible de una excepcion inesperada (RF-20)
 'use strict';
 
 class ApiError extends Error {
-  /**
-   * @param {number} estado Codigo HTTP.
-   * @param {string} mensaje Mensaje apto para mostrar al usuario.
-   * @param {Array} detalles Errores de validacion por campo, si aplica.
-   */
   constructor(estado, mensaje, detalles = []) {
     super(mensaje);
     this.name = 'ApiError';
     this.estado = estado;
     this.detalles = detalles;
-    // Marca los errores previstos: el middleware muestra su mensaje tal cual,
-    // mientras que a los inesperados les responde un texto generico.
     this.esOperacional = true;
     Error.captureStackTrace(this, this.constructor);
   }
@@ -36,6 +28,10 @@ class ApiError extends Error {
 
   static conflicto(mensaje) {
     return new ApiError(409, mensaje);
+  }
+
+  static demasiadasPeticiones(mensaje) {
+    return new ApiError(429, mensaje);
   }
 
   static interno(mensaje) {

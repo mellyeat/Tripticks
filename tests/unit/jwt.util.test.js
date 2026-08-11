@@ -1,4 +1,3 @@
-// Pruebas de la emision y verificacion de tokens (RNF-03)
 'use strict';
 
 const jwt = require('jsonwebtoken');
@@ -17,8 +16,6 @@ describe('jwt.util', () => {
     });
 
     it('no expone datos sensibles del usuario', () => {
-      // El token viaja al navegador y cualquiera puede decodificarlo:
-      // solo debe llevar lo indispensable.
       const payload = jwtUtil.verificar(
         jwtUtil.firmar({ ...USUARIO, email: 'ana@ejemplo.com', password_hash: '$2b$10$abc' })
       );

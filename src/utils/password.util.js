@@ -1,25 +1,13 @@
-// Hash y verificacion de contrasenas con bcrypt (RNF-02)
 'use strict';
 
 const bcrypt = require('bcrypt');
 const { bcrypt: config } = require('../config/env');
 
-/**
- * @param {string} plana Contrasena en texto claro.
- * @returns {Promise<string>} Hash con salt incluido.
- */
 async function hashear(plana) {
   return bcrypt.hash(plana, config.saltRounds);
 }
 
-/**
- * @param {string} plana Contrasena capturada en el formulario.
- * @param {string} hash Hash almacenado en la base de datos.
- * @returns {Promise<boolean>}
- */
 async function verificar(plana, hash) {
-  // bcrypt.compare rechaza si el hash es null o malformado; un usuario sin hash
-  // valido no debe tumbar el login, solo fallar la comparacion.
   if (!plana || !hash) {
     return false;
   }
@@ -27,4 +15,21 @@ async function verificar(plana, hash) {
   return bcrypt.compare(plana, hash);
 }
 
-module.exports = { hashear, verificar };
+/* Comparacion contra un hash de descarte, para cuando el correo no existe.
+   Sin esto, esa respuesta vuelve de inmediato y la del correo correcto tarda lo
+   que tarda bcrypt: la diferencia de tiempo revela que cuentas existen, que es
+   justo lo que el mensaje unico de error trata de ocultar.
+
+   El hash se calcula una sola vez y con las mismas rondas configuradas, para
+   que el trabajo sea el mismo por ambos caminos. */
+let hashDeDescarte = null;
+
+async function verificarInexistente(plana) {
+  if (!hashDeDescarte) {
+    hashDeDescarte = await hashear(`descarte:${Date.now()}:${Math.random()}`);
+  }
+
+  return bcrypt.compare(String(plana || ''), hashDeDescarte);
+}
+
+module.exports = { hashear, verificar, verificarInexistente };

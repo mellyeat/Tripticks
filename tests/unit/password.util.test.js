@@ -1,4 +1,3 @@
-// Pruebas del hasheo de contrasenas (RNF-02)
 'use strict';
 
 const password = require('../../src/utils/password.util');
@@ -9,12 +8,10 @@ describe('password.util', () => {
       const hash = await password.hashear('Secreta123');
 
       expect(hash).not.toBe('Secreta123');
-      expect(hash).toMatch(/^\$2[aby]\$/); // Formato de bcrypt
+      expect(hash).toMatch(/^\$2[aby]\$/);
     });
 
     it('genera hashes distintos para la misma contrasena', async () => {
-      // El salt aleatorio evita que dos usuarios con la misma contrasena
-      // tengan el mismo hash almacenado.
       const primero = await password.hashear('Secreta123');
       const segundo = await password.hashear('Secreta123');
 

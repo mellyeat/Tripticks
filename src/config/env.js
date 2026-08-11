@@ -1,4 +1,3 @@
-// Lectura y validacion de variables de entorno (RNF-13, RNF-17)
 'use strict';
 
 const path = require('path');
@@ -6,8 +5,6 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-// Si falta una variable critica preferimos caer al arrancar y no a mitad de un
-// request: un JWT_SECRET undefined haria que jsonwebtoken firme con "undefined".
 const REQUERIDAS = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'JWT_SECRET'];
 
 function validar() {
@@ -24,6 +21,15 @@ function validar() {
 function entero(valor, porDefecto) {
   const n = Number.parseInt(valor, 10);
   return Number.isNaN(n) ? porDefecto : n;
+}
+
+// Lista separada por comas. Vacia significa "solo el mismo origen": la API y las
+// vistas viajan juntas, asi que ningun navegador legitimo necesita CORS.
+function lista(valor) {
+  return String(valor || '')
+    .split(',')
+    .map((origen) => origen.trim())
+    .filter((origen) => origen.length > 0);
 }
 
 validar();
@@ -43,4 +49,9 @@ module.exports = {
   bcrypt: {
     saltRounds: entero(process.env.BCRYPT_SALT_ROUNDS, 10),
   },
+  corsOrigenes: lista(process.env.CORS_ORIGINS),
+  // Numero de proxies de confianza delante de la aplicacion. Sin esto, detras de
+  // un balanceador todas las peticiones comparten la IP del proxy y el cupo de
+  // peticiones se agotaria para todo el mundo a la vez.
+  proxiesDeConfianza: entero(process.env.TRUST_PROXY, 0),
 };

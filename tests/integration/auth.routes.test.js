@@ -1,15 +1,21 @@
-// Pruebas de los endpoints de autenticacion (RF-01, RF-02, RF-03, RNF-18)
 'use strict';
 
 const request = require('supertest');
 
-// Se sustituye la capa de datos para que la suite no dependa de Supabase:
-// lo que se prueba aqui es la cadena HTTP, no la base.
 jest.mock('../../src/models/user.model');
 
 const userModel = require('../../src/models/user.model');
 const app = require('../../src/app');
 const password = require('../../src/utils/password.util');
+const limitePeticiones = require('../../src/middlewares/rateLimit.middleware');
+
+/* Registro e inicio de sesion comparten el cupo de peticiones por IP, y toda la
+   suite corre desde la misma. Sin reiniciarlo entre casos, los ultimos
+   recibirian 429 por culpa de los anteriores. El cupo se prueba aparte, en
+   tests/integration/seguridad.test.js. */
+beforeEach(() => {
+  limitePeticiones.reiniciar();
+});
 
 const USUARIO = {
   id: 'e7c1a9f0-0000-4000-8000-000000000001',
@@ -67,7 +73,6 @@ describe('POST /api/auth/register (RF-01)', () => {
   });
 
   it('ignora el rol enviado por el cliente (RF-17)', async () => {
-    // Sin esto cualquiera se registraria como administrador.
     userModel.existeEmail.mockResolvedValue(false);
     userModel.crear.mockResolvedValue(USUARIO);
 
@@ -145,7 +150,6 @@ describe('POST /api/auth/login (RF-02)', () => {
   });
 
   it('usa el mismo mensaje para correo inexistente y contrasena incorrecta', async () => {
-    // Mensajes distintos permitirian averiguar que correos estan registrados.
     userModel.buscarPorEmailConHash.mockResolvedValue(null);
     const inexistente = await request(app)
       .post('/api/auth/login')
@@ -219,8 +223,6 @@ describe('Rutas protegidas (RNF-03, RF-17)', () => {
   });
 
   it('rechaza el token de un usuario desactivado despues de emitirlo', async () => {
-    // El token sigue siendo valido criptograficamente: la desactivacion solo
-    // se detecta porque el middleware relee al usuario.
     const token = await tokenValido();
     userModel.buscarPorId.mockResolvedValue({ ...USUARIO, activo: false });
 
