@@ -38,16 +38,19 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.111.0",
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
-    "morgan": "^1.11.0"
+    "morgan": "^1.11.0",
+    "pug": "^3.0.4"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",
+    "html2pug": "^4.0.0",
     "jest": "^30.4.2",
     "nodemon": "^3.1.14",
     "supertest": "^7.2.2",

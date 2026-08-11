@@ -1,0 +1,118 @@
+extends ../layouts/base.pug
+
+block variables
+  - var titulo = 'Crear cuenta - TripTicks'
+  - var descripcion = 'Crea tu cuenta en TripTicks y reserva experiencias de viaje curadas.'
+  - var clasesBody = 'bg-off-white text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col'
+  - var scriptsVista = ['/js/auth.js']
+
+block contenido
+  header(class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md shadow-sm")
+    div(class="shell flex justify-between items-center py-4 gap-4")
+      a(href="/", class="font-display-lg text-display-lg-mobile text-deep-teal tracking-tight shrink-0 hover:scale-105 transition-transform duration-200") TripTicks
+      nav(class="hidden md:flex items-center gap-gutter", aria-label="Navegacion principal")
+        | #[a(href="/", class="nav-link") Inicio] #[a(href="/trips", class="nav-link") Viajes]
+      div(class="flex items-center gap-4")
+        | #[a(href="/login", class="nav-link") Iniciar sesion] #[a(href="/register", class="nav-link-active", aria-current="page") Registro]
+  main(class="grow flex flex-col md:flex-row pt-28 md:pt-24")
+    //-
+      Columna del formulario, sobre el fondo off-white y dentro de una
+      tarjeta translucida que la separa de la fotografia contigua.
+    section(class="w-full md:w-1/2 lg:w-[45%] flex flex-col justify-center px-margin-mobile md:px-margin-desktop py-12 z-10")
+      div(class="w-full max-w-md mx-auto glass-panel p-8 md:p-12 animate-fade-up")
+        div(class="mb-8")
+          h1(class="font-headline-md text-headline-md text-deep-teal mb-2") Crear cuenta
+          p(class="font-body-sm text-body-sm text-warm-gray") Unete al viaje hacia la aventura sofisticada.
+        //-
+          Registro con proveedores externos.
+          RF-01 define el alta solo con nombre, correo y contrasena, y el
+          backend no expone OAuth. Los botones conservan el diseno pero
+          van deshabilitados en lugar de simular un flujo inexistente.
+        div(class="space-y-4 mb-4")
+          button(type="button", class="btn-social", disabled, title="Disponible proximamente")
+            svg(class="w-5 h-5", viewBox="0 0 24 24", xmlns="http://www.w3.org/2000/svg", aria-hidden="true")
+              path(d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z", fill="#4285F4")
+              path(d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z", fill="#34A853")
+              path(d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z", fill="#FBBC05")
+              path(d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z", fill="#EA4335")
+            | Continuar con Google
+          button(type="button", class="btn-social", disabled, title="Disponible proximamente")
+            svg(class="w-5 h-5", fill="currentColor", viewBox="0 0 24 24", xmlns="http://www.w3.org/2000/svg", aria-hidden="true")
+              path(d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.19 2.31-.88 3.5-.8 1.49.09 2.59.6 3.32 1.46-2.73 1.58-2.27 5.09.43 6.17-.65 1.95-1.57 3.8-2.33 5.34zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.02 4.41-3.74 4.25z")
+            | Continuar con Apple
+        p(class="font-body-sm text-body-sm text-warm-gray text-center mb-8") El registro con proveedores externos aun no esta disponible.
+        div(class="flex items-center gap-4 mb-8")
+          | #[span(class="grow border-t border-outline-variant", aria-hidden="true")] #[span(class="font-body-sm text-body-sm text-warm-gray") o registrate con tu correo] #[span(class="grow border-t border-outline-variant", aria-hidden="true")]
+        div#form-alert(class="alert-error hidden mb-6", role="alert")
+        form#register-form(novalidate, class="space-y-5")
+          div
+            label(for="nombre", class="field-label") NOMBRE COMPLETO
+            input#nombre(type="text", name="nombre", class="field", placeholder="Ana Martinez", autocomplete="name", required)
+            p(class="font-body-sm text-body-sm text-error mt-2 hidden", data-error="nombre")
+          div
+            label(for="email", class="field-label") CORREO ELECTRONICO
+            input#email(type="email", name="email", class="field", placeholder="ana@ejemplo.com", autocomplete="email", required)
+            p(class="font-body-sm text-body-sm text-error mt-2 hidden", data-error="email")
+          //-
+            La nacionalidad viene del diseno, pero no existe como columna
+            en la tabla de usuarios ni la acepta /auth/register. Se queda
+            como campo opcional de la interfaz y no se envia al API.
+          div
+            label(for="nacionalidad", class="field-label") NACIONALIDAD
+            div(class="relative")
+              select#nacionalidad(name="nacionalidad", class="field-select")
+                option(value, selected) Selecciona tu nacionalidad
+                option(value="MX") Mexico
+                option(value="ES") Espana
+                option(value="AR") Argentina
+                option(value="CO") Colombia
+                option(value="CL") Chile
+                option(value="PE") Peru
+                option(value="US") Estados Unidos
+                option(value="OT") Otra
+              span(class="field-select-icon")
+                span(class="material-symbols-outlined", aria-hidden="true") expand_more
+          div
+            label(for="password", class="field-label") CONTRASENA
+            div(class="relative")
+              input#password(type="password", name="password", class="field pr-12", placeholder="Minimo 8 caracteres", autocomplete="new-password", aria-describedby="password-ayuda", required)
+              button(type="button", data-toggle-password="password", class="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray hover:text-deep-teal p-1 rounded", aria-label="Mostrar contrasena")
+                span(class="material-symbols-outlined text-xl", aria-hidden="true") visibility
+            //- Los cuatro segmentos y la etiqueta los actualiza auth.js.
+            div(class="mt-2 flex gap-1", aria-hidden="true")
+              | #[span(class="strength-bar", data-strength-bar)] #[span(class="strength-bar", data-strength-bar)] #[span(class="strength-bar", data-strength-bar)] #[span(class="strength-bar", data-strength-bar)]
+            p(class="font-body-sm text-body-sm text-warm-gray mt-1 text-right h-5", data-strength-label, role="status")
+            p#password-ayuda(class="font-body-sm text-body-sm text-warm-gray")
+              | Al menos 8 caracteres, con una mayuscula, una minuscula y un numero.
+            p(class="font-body-sm text-body-sm text-error mt-2 hidden", data-error="password")
+          div
+            label(for="passwordConfirmacion", class="field-label") CONFIRMAR CONTRASENA
+            div(class="relative")
+              input#passwordConfirmacion(type="password", name="passwordConfirmacion", class="field pr-12", placeholder="Repite tu contrasena", autocomplete="new-password", required)
+              button(type="button", data-toggle-password="passwordConfirmacion", class="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray hover:text-deep-teal p-1 rounded", aria-label="Mostrar contrasena")
+                span(class="material-symbols-outlined text-xl", aria-hidden="true") visibility
+            p(class="font-body-sm text-body-sm text-error mt-2 hidden", data-error="passwordConfirmacion")
+          div(class="pt-1")
+            div(class="flex items-start gap-3")
+              input#terminos(type="checkbox", name="terminos", class="checkbox mt-1", required)
+              label(for="terminos", class="font-body-sm text-body-sm text-on-surface-variant")
+                | Acepto los #[a(href="#", class="text-deep-teal font-semibold hover:underline") terminos y condiciones] y el #[a(href="#", class="text-deep-teal font-semibold hover:underline") aviso de privacidad].
+            p(class="font-body-sm text-body-sm text-error mt-2 hidden", data-error="terminos")
+          button(type="submit", class="btn-primary w-full group")
+            | Crear cuenta #[span(class="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform", aria-hidden="true") arrow_forward]
+        p(class="font-body-sm text-body-sm text-on-surface-variant mt-8 text-center")
+          | Ya tienes cuenta? #[a(href="/login", class="text-deep-teal font-semibold hover:underline") Inicia sesion]
+    //- Fotografia decorativa con la tarjeta flotante del diseno.
+    section(class="hidden md:block md:w-1/2 lg:w-[55%] relative overflow-hidden", aria-hidden="true")
+      div(class="absolute inset-0 bg-cover bg-center bg-no-repeat", style="background-image: url('https://images.unsplash.com/photo-1783455539989-daf12c20c547?auto=format&fit=crop&q=85&w=2000')")
+      div(class="absolute inset-0 bg-primary/20 mix-blend-multiply")
+      div(class="absolute bottom-12 right-12 max-w-sm p-6 rounded-xl shadow-lg bg-warm-sand/90 backdrop-blur-sm border border-white/20")
+        span(class="material-symbols-outlined text-soft-terracota text-3xl mb-2", aria-hidden="true") flight_takeoff
+        p(class="font-headline-sm text-headline-sm text-primary mb-1") Escapadas curadas
+        p(class="font-body-sm text-body-sm text-on-surface-variant") Descubre destinos elegidos para tu forma de viajar.
+  footer(class="w-full py-12 bg-tertiary-container text-on-tertiary-container mt-auto")
+    div(class="shell grid grid-cols-1 md:grid-cols-4 gap-gutter items-center")
+      div(class="md:col-span-1")
+        | #[span(class="font-display-lg text-display-lg-mobile text-on-tertiary-container block") TripTicks] #[span(class="font-body-sm text-body-sm text-on-tertiary-container/60 mt-2 block") &copy; 2026 TripTicks. Sistema de reservacion de viajes.]
+      nav(class="md:col-span-3 flex flex-wrap gap-6 justify-start md:justify-end", aria-label="Enlaces del pie de pagina")
+        | #[a(href="/trips", class="footer-link") Viajes] #[a(href="/login", class="footer-link") Iniciar sesion] #[a(href="/", class="footer-link") Inicio] #[a(href="mailto:contacto@tripticks.com", class="footer-link") Contacto]

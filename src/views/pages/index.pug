@@ -1,0 +1,122 @@
+extends ../layouts/base.pug
+
+block variables
+  - var titulo = 'TripTicks - Descubre tu proxima aventura'
+  - var descripcion = 'TripTicks - Reserva experiencias de viaje curadas para viajeros exigentes.'
+  - var clasesBody = 'bg-off-white text-on-background font-body-md text-body-md antialiased overflow-x-hidden'
+  //-
+    Los viajes llegan desde la ruta (src/routes/web.routes.js), que consulta el
+    catalogo real: "destacados" son los tres proximos con cupo y "proximos" los
+    dos siguientes. La fotografia del encabezado si es decorativa y fija.
+
+block contenido
+  +encabezado("inicio")
+  main(class="pt-24 md:pt-32 pb-24")
+    section(class="shell animate-fade-up")
+      div(class="relative w-full h-[600px] rounded-xl overflow-hidden shadow-2xl")
+        div(class="absolute inset-0 bg-cover bg-center", style="background-image: url('https://images.unsplash.com/photo-1753618282380-2e97ab8cbb50?auto=format&fit=crop&q=85&w=2560')", role="img", aria-label="Vista aerea de una costa tropical de aguas turquesa")
+        div(class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/30 to-transparent")
+        div(class="absolute inset-0 flex flex-col justify-end p-8 md:p-16")
+          h1(class="font-display-lg text-display-lg-mobile md:text-display-lg text-white max-w-2xl mb-6 drop-shadow-md") Descubre tu proxima aventura sofisticada.
+          p(class="font-body-lg text-body-lg text-off-white/90 max-w-xl mb-12")
+            | Experiencias curadas para viajeros exigentes. Encuentra destinos exclusivos y retiros disenados solo para ti.
+          form(action="/trips", method="get", class="bg-off-white p-6 rounded-xl shadow-[0_20px_40px_-12px_rgba(15,76,92,0.2)] w-full max-w-4xl mx-auto md:mx-0 translate-y-16 md:translate-y-8 relative z-10 border border-surface-variant")
+            div(class="flex flex-col md:flex-row gap-4 items-end")
+              div(class="w-full md:flex-1")
+                label(for="hero-destino", class="field-label") Destino
+                div(class="relative")
+                  span(class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray text-xl", aria-hidden="true") location_on
+                  input#hero-destino(type="text", name="destino", placeholder="A donde vas?", class="field field-icon", autocomplete="off")
+              div(class="w-full md:flex-1")
+                label(for="hero-salida", class="field-label") Fecha de salida
+                div(class="relative")
+                  span(class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray text-xl", aria-hidden="true") calendar_month
+                  input#hero-salida(type="date", name="salida", class="field field-icon")
+              div(class="w-full md:flex-1")
+                label(for="hero-regreso", class="field-label") Fecha de regreso
+                div(class="relative")
+                  span(class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray text-xl", aria-hidden="true") event_available
+                  input#hero-regreso(type="date", name="regreso", class="field field-icon")
+              button(type="submit", class="btn-primary w-full md:w-auto px-8 shrink-0")
+                | #[span(class="material-symbols-outlined text-lg", aria-hidden="true") search] Buscar
+    section(class="shell mt-40 md:mt-32 animate-fade-up delay-100")
+      div(class="mb-12 flex flex-col md:flex-row justify-between items-end gap-4")
+        div
+          h2(class="font-headline-md text-headline-md text-primary mb-2") Destinos Destacados
+          p(class="font-body-md text-body-md text-on-surface-variant") Selecciones curadas para tu proximo escape.
+        a(href="/trips", class="text-deep-teal font-label-caps text-label-caps flex items-center gap-1 hover:text-primary transition-colors group")
+          | Ver todos #[span(class="material-symbols-outlined group-hover:translate-x-1 transition-transform", aria-hidden="true") arrow_forward]
+      if destacados && destacados.length > 0
+        //-
+          Reticula tipo bento: el primer viaje ocupa el bloque grande y los dos
+          siguientes las celdas de la derecha.
+        div#featured-trips(class="grid grid-cols-1 md:grid-cols-12 gap-gutter auto-rows-[300px]")
+          each viaje, indice in destacados
+            - var principal = indice === 0
+            a(
+              href="/trips/" + viaje.id,
+              class=["premium-card group relative rounded-xl overflow-hidden shadow-sm block", principal ? "md:col-span-8 md:row-span-2" : "md:col-span-4 md:row-span-1"]
+            )
+              div(
+                class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105",
+                style=`background-image: url('${viaje.imagen_url}')`,
+                role="img",
+                aria-label=viaje.titulo
+              )
+              div(class=["absolute inset-0 bg-gradient-to-t", principal ? "from-primary/90 via-primary/20 to-transparent" : "from-primary/80 to-transparent"])
+              if principal
+                div(class="absolute bottom-0 left-0 p-8 w-full")
+                  div(class="flex flex-wrap gap-2 mb-3")
+                    span(class="chip")= viaje.destino
+                    span(class="chip-glass")
+                      | #[span(class="material-symbols-outlined text-[14px]", aria-hidden="true") event_seat] #{viaje.cupos_disponibles} cupos
+                  h3(class="font-headline-sm text-headline-sm text-white mb-2")= viaje.titulo
+                  div(class="flex items-center gap-4 text-off-white/90")
+                    span(class="font-headline-sm text-headline-sm text-white")= formato.moneda(viaje.precio)
+                    span(class="font-body-sm text-body-sm flex items-center gap-1")
+                      | #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") calendar_month] #{formato.rangoFechas(viaje.fecha_salida, viaje.fecha_regreso)}
+              else
+                div(class="absolute bottom-0 left-0 p-6 w-full")
+                  span(class="chip mb-2")= viaje.destino
+                  h3(class="font-body-lg text-body-lg font-semibold text-white")= viaje.titulo
+                  div(class="flex items-center justify-between mt-1 gap-3")
+                    span(class="font-body-lg text-body-lg font-semibold text-white")= formato.moneda(viaje.precio)
+                    span(class="font-body-sm text-body-sm text-off-white/80") #{viaje.cupos_disponibles} cupos
+      else
+        div(class="text-center py-20 rounded-xl border border-outline-variant/40 bg-surface-container-low")
+          span(class="material-symbols-outlined text-warm-gray text-[64px] mb-4", aria-hidden="true") travel_explore
+          h3(class="font-headline-sm text-headline-sm text-on-surface mb-2") Todavia no hay salidas publicadas
+          p(class="font-body-md text-body-md text-on-surface-variant mb-6") En cuanto se abra un viaje con cupo aparecera aqui.
+          a(href="/trips", class="btn-secondary") Ver el catalogo
+    if proximos && proximos.length > 0
+      section(class="shell mt-24 md:mt-32 animate-fade-up delay-200")
+        div(class="bg-surface-container-low rounded-xl p-8 md:p-12 relative overflow-hidden border border-outline-variant/30")
+          div(class="absolute -right-24 -top-24 w-96 h-96 bg-inverse-primary/10 rounded-full blur-3xl pointer-events-none")
+          div(class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-12")
+            div(class="w-full md:w-1/3")
+              span(class="text-soft-terracota font-label-caps text-label-caps block mb-2") CUPOS LIMITADOS
+              h2(class="font-headline-md text-headline-md text-primary mb-4") Proximas Salidas
+              p(class="font-body-md text-body-md text-on-surface-variant mb-8")
+                | Viajes con fecha de salida cercana. Los lugares se asignan por orden de reservacion, asi que conviene apartar el tuyo pronto.
+              a(href="/trips", class="btn-secondary") Ver todo el catalogo
+            div#upcoming-trips(class="w-full md:w-2/3 flex flex-col sm:flex-row gap-gutter")
+              each viaje in proximos
+                article(class="premium-card group bg-off-white rounded-lg p-4 shadow-sm border border-surface-variant flex-1 flex flex-col")
+                  div(class="w-full h-40 rounded-md overflow-hidden mb-4 relative")
+                    div(
+                      class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500",
+                      style=`background-image: url('${viaje.imagen_url}')`,
+                      role="img",
+                      aria-label=viaje.titulo
+                    )
+                  div(class="flex justify-between items-start mb-2 gap-2")
+                    h3(class="font-body-lg text-body-lg font-semibold text-primary")= viaje.destino
+                    //- Menos de cinco lugares se marca en tono de alerta, igual que en el catalogo.
+                    span(class=[viaje.cupos_disponibles < 5 ? "chip-alert" : "chip", "shrink-0"]) #{viaje.cupos_disponibles} cupos
+                  p(class="font-body-sm text-body-sm text-warm-gray mb-4 flex items-center gap-1")
+                    | #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") calendar_month] #{formato.rangoFechas(viaje.fecha_salida, viaje.fecha_regreso)}
+                  div(class="flex items-center justify-between mt-auto pt-3 border-t border-outline-variant/30 gap-3")
+                    span(class="font-headline-sm text-headline-sm text-deep-teal")= formato.moneda(viaje.precio)
+                    a(href="/trips/" + viaje.id, class="font-label-caps text-label-caps text-deep-teal hover:text-primary flex items-center gap-1")
+                      | Ver detalle #[span(class="material-symbols-outlined text-[16px]", aria-hidden="true") arrow_forward]
+  +piePagina()

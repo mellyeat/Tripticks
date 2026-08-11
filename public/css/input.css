@@ -3,6 +3,7 @@
 
 @source "../**/*.html";
 @source "../js/**/*.js";
+@source "../../src/views/**/*.pug";
 
 @theme {
   --color-deep-teal: #0f4c5c;
@@ -111,7 +112,6 @@
   --spacing-margin-mobile: 16px;
   --spacing-margin-desktop: 40px;
 
-  /* Ancho maximo del contenedor principal (max-w-container-max) */
   --container-container-max: 1280px;
 }
 
@@ -182,6 +182,24 @@
            text-primary hover:bg-surface-container-high;
   }
 
+  /* Proveedores externos (Google / Apple). Se dejan deshabilitados: el backend
+     todavia no expone OAuth, asi que el boton comunica la intencion sin fingir
+     que funciona. */
+  .btn-social {
+    @apply w-full inline-flex items-center justify-center gap-3 min-h-12 px-4 rounded-lg
+           bg-surface-container-lowest border border-outline-variant shadow-sm
+           font-body-md text-body-md font-semibold text-on-surface
+           transition-colors hover:bg-surface-container-low
+           disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none
+           disabled:hover:bg-surface-container-lowest;
+  }
+
+  .btn-link-quiet {
+    @apply font-body-sm text-body-sm text-deep-teal bg-transparent p-0
+           hover:text-primary transition-colors
+           disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:text-deep-teal;
+  }
+
   .field-label {
     @apply block font-label-caps text-label-caps text-on-surface-variant mb-2;
   }
@@ -195,6 +213,22 @@
 
   .field-icon {
     @apply pl-10;
+  }
+
+  /* Los desplegables ocultan la flecha nativa; el hueco de la derecha lo ocupa
+     un icono de Material Symbols posicionado en valor absoluto. */
+  .field-select {
+    @apply w-full appearance-none pl-4 pr-12 py-3 bg-surface border border-outline-variant
+           rounded-lg font-body-md text-body-md text-on-background outline-none
+           transition-all focus:ring-2 focus:ring-deep-teal focus:border-deep-teal;
+  }
+
+  .field-select-icon {
+    @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-outline;
+  }
+
+  .checkbox {
+    @apply w-4 h-4 shrink-0 accent-deep-teal cursor-pointer;
   }
 
   .chip {
@@ -213,17 +247,44 @@
            font-label-caps text-label-caps;
   }
 
+  /* Chip seleccionable de intereses. El input va oculto con .sr-only y el chip
+     reacciona como hermano posterior, de modo que el control sigue siendo un
+     checkbox real para el teclado y los lectores de pantalla. */
+  .chip-interest {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-full cursor-pointer
+           font-label-caps text-label-caps transition-colors
+           bg-warm-sand text-deep-teal hover:brightness-95;
+  }
+
+  /* El check se oculta desde un envoltorio propio y no desde el icono: la regla
+     base de .material-symbols-outlined ya fija display y ganaria a cualquier
+     regla de componentes aplicada sobre ese mismo elemento. */
+  .chip-interest .chip-check {
+    @apply hidden;
+  }
+
+  input:checked ~ .chip-interest {
+    @apply bg-deep-teal text-white shadow-sm;
+  }
+
+  input:checked ~ .chip-interest .chip-check {
+    @apply inline-flex items-center;
+  }
+
+  input:focus-visible ~ .chip-interest {
+    outline: 2px solid var(--color-deep-teal);
+    outline-offset: 2px;
+  }
+
   .card {
     @apply bg-surface-container-lowest rounded-xl overflow-hidden
            shadow-[0_4px_30px_rgba(0,52,65,0.06)];
   }
 
-  /* Sombra ambiental difusa, tenida con el teal primario */
   .ambient-shadow {
     box-shadow: 0 10px 40px -10px rgba(15, 76, 92, 0.08);
   }
 
-  /* ---------- Opcion seleccionable (metodo de pago) ---------- */
   .option-card {
     @apply border-2 border-outline-variant rounded-xl p-6 transition-all duration-200
            hover:border-primary/50;
@@ -233,7 +294,6 @@
     @apply border-primary bg-surface;
   }
 
-  /* ---------- Pasos del proceso de reservacion ---------- */
   .step-dot {
     @apply w-8 h-8 rounded-full flex items-center justify-center mb-2
            font-body-sm text-body-sm font-semibold
@@ -254,6 +314,77 @@
 
   .premium-card:hover {
     @apply -translate-y-1 scale-[1.02] shadow-[0_20px_40px_-12px_rgba(15,76,92,0.15)];
+  }
+
+  .panel {
+    @apply bg-surface rounded-xl p-6 md:p-8 border border-outline-variant/30
+           shadow-[0_8px_30px_rgba(0,0,0,0.04)];
+  }
+
+  .panel-title {
+    @apply font-headline-sm text-headline-sm text-deep-teal mb-6
+           border-b border-outline-variant/50 pb-4 flex items-center gap-3;
+  }
+
+  /* Tarjeta translucida del registro: se apoya sobre el fondo off-white y
+     levanta el formulario con una sombra tenue en tono teal. */
+  .glass-panel {
+    @apply rounded-xl border border-white/50;
+    background: rgba(249, 248, 246, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 20px 40px rgba(15, 76, 92, 0.08);
+  }
+
+  .account-link {
+    @apply rounded-lg px-4 py-3 flex items-center gap-3 transition-colors
+           font-body-md text-body-md text-on-surface-variant
+           hover:bg-surface-container-high hover:text-on-surface;
+  }
+
+  .account-link-active {
+    @apply rounded-lg px-4 py-3 flex items-center gap-3 transition-transform
+           font-body-md text-body-md font-bold
+           bg-primary-container text-on-primary-container hover:scale-[1.02];
+  }
+
+  .account-link-danger {
+    @apply rounded-lg px-4 py-3 flex items-center gap-3 transition-colors w-full text-left
+           font-body-md text-body-md font-bold text-error hover:bg-error-container/20;
+  }
+
+  .tab {
+    @apply pb-4 font-label-caps text-label-caps text-on-surface-variant
+           border-b-2 border-transparent hover:text-primary transition-colors;
+  }
+
+  .tab-active {
+    @apply pb-4 font-label-caps text-label-caps text-primary border-b-2 border-primary;
+  }
+
+  .badge-confirmada {
+    @apply px-3 py-1 rounded-full shadow-sm font-label-caps text-label-caps
+           bg-primary text-on-primary;
+  }
+
+  .badge-pendiente {
+    @apply px-3 py-1 rounded-full shadow-sm font-label-caps text-label-caps
+           bg-surface text-on-surface border border-outline-variant;
+  }
+
+  .badge-cancelada {
+    @apply px-3 py-1 rounded-full shadow-sm font-label-caps text-label-caps
+           bg-error-container text-on-error-container;
+  }
+
+  .badge-completada {
+    @apply px-3 py-1 rounded-full shadow-sm font-label-caps text-label-caps
+           bg-warm-sand text-deep-teal;
+  }
+
+  .link-danger {
+    @apply font-label-caps text-label-caps text-error
+           hover:underline transition-all inline-flex items-center gap-1;
   }
 
   .nav-link {
@@ -284,6 +415,216 @@
   .alert-success {
     @apply flex items-center gap-2 p-4 rounded-lg
            bg-warm-sand text-deep-teal font-body-sm text-body-sm;
+  }
+
+  /* ------------------------------------------------------------------
+     Consola de administracion (RF-13 a RF-16).
+     ------------------------------------------------------------------ */
+
+  .admin-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+           font-body-md text-body-md text-warm-gray
+           hover:text-deep-teal hover:bg-surface-container-high;
+  }
+
+  .admin-link-active {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg
+           font-body-md text-body-md font-semibold
+           bg-warm-sand text-deep-teal;
+  }
+
+  /* Secciones del panel que todavia no existen como pagina: se muestran para
+     no romper el mapa de navegacion, pero no llevan a ningun lado. */
+  .admin-link-disabled {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg
+           font-body-md text-body-md text-warm-gray opacity-50 cursor-not-allowed;
+  }
+
+  .stat-card {
+    @apply rounded-xl p-6 bg-surface-container-lowest border border-outline-variant/30
+           shadow-[0_4px_24px_rgba(15,76,92,0.04)]
+           transition-transform duration-300 hover:-translate-y-1;
+  }
+
+  .stat-icon {
+    @apply inline-flex p-2 rounded-lg;
+  }
+
+  .icon-btn {
+    @apply inline-flex items-center justify-center p-2 rounded-lg shadow-sm
+           bg-surface-container-lowest border border-outline-variant text-warm-gray
+           transition-colors hover:text-deep-teal hover:border-deep-teal
+           disabled:opacity-50 disabled:cursor-not-allowed
+           disabled:hover:text-warm-gray disabled:hover:border-outline-variant;
+  }
+
+  .avatar-initials {
+    @apply flex items-center justify-center shrink-0 w-10 h-10 rounded-full
+           bg-surface-container-high text-on-surface-variant
+           border border-outline-variant/50
+           font-body-sm text-body-sm font-semibold;
+  }
+
+  .role-chip-admin {
+    @apply inline-block px-3 py-1 rounded-full
+           bg-warm-sand text-deep-teal font-body-sm text-xs font-semibold;
+  }
+
+  .role-chip-user {
+    @apply inline-block px-3 py-1 rounded-full
+           bg-surface-container text-on-surface-variant border border-outline-variant/30
+           font-body-sm text-xs font-medium;
+  }
+
+  .status-dot {
+    @apply w-2 h-2 rounded-full shrink-0;
+  }
+
+  /* Estado de un viaje. No es una columna de la tabla: se deduce de "activo"
+     y de "cupos_disponibles", por eso son tres badges y no un enum. */
+  .badge-disponible {
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full shadow-sm
+           font-label-caps text-label-caps bg-primary text-on-primary;
+  }
+
+  .badge-agotado {
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full shadow-sm
+           font-label-caps text-label-caps bg-error-container text-on-error-container;
+  }
+
+  .badge-inactivo {
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full shadow-sm
+           font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant;
+  }
+
+  /* Fila de formulario administrativo: descripcion a la izquierda y campos a
+     la derecha, apiladas en movil. */
+  .form-section {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-gutter p-6 md:p-8
+           border-b border-outline-variant/30 last:border-0;
+  }
+
+  .form-section-aside {
+    @apply md:col-span-1;
+  }
+
+  .form-section-fields {
+    @apply md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 content-start;
+  }
+
+  .form-hint {
+    @apply flex items-center gap-1 font-body-sm text-body-sm text-warm-gray mt-2;
+  }
+
+  .admin-th {
+    @apply py-4 px-6 text-left font-semibold
+           font-label-caps text-label-caps text-warm-gray uppercase;
+  }
+
+  .admin-td {
+    @apply py-4 px-6 font-body-sm text-body-sm;
+  }
+
+  .admin-row {
+    @apply transition-colors hover:bg-surface-container-low;
+  }
+
+  /* Barras del grafico de demanda. La altura la fija un estilo en linea
+     calculado a partir de las reservaciones de cada viaje. */
+  .chart-bar {
+    @apply flex-1 rounded-t-sm bg-deep-teal/60 transition-colors hover:bg-deep-teal;
+  }
+
+  .chart-bar-top {
+    @apply flex-1 rounded-t-sm bg-soft-terracota transition-colors hover:bg-secondary;
+  }
+
+  /* Dona de proporciones. El reparto va en un conic-gradient en linea y el
+     hueco central lo abre este pseudoelemento. */
+  .donut {
+    @apply relative rounded-full shrink-0;
+  }
+
+  .donut::after {
+    content: '';
+    position: absolute;
+    inset: 24%;
+    border-radius: 9999px;
+    background-color: var(--color-surface-container-lowest);
+  }
+
+  .metric-up {
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded-full
+           font-body-sm text-body-sm font-semibold bg-warm-sand text-deep-teal;
+  }
+
+  .metric-down {
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded-full
+           font-body-sm text-body-sm font-semibold bg-error-container text-on-error-container;
+  }
+
+  .page-btn {
+    @apply inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-lg
+           border border-outline-variant bg-surface-container-lowest
+           font-body-sm text-body-sm text-on-surface-variant transition-colors
+           hover:border-deep-teal hover:text-deep-teal
+           disabled:opacity-40 disabled:cursor-not-allowed
+           disabled:hover:border-outline-variant disabled:hover:text-on-surface-variant;
+  }
+
+  .page-btn-active {
+    @apply inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-lg
+           bg-deep-teal text-white font-body-sm text-body-sm font-semibold;
+  }
+
+  /* Interruptor de notificaciones. El checkbox real queda transparente encima
+     del riel para conservar el foco y el clic nativos. */
+  .toggle {
+    @apply relative inline-block w-11 h-6 shrink-0;
+  }
+
+  .toggle input {
+    @apply absolute inset-0 w-full h-full m-0 opacity-0 cursor-pointer z-10;
+  }
+
+  .toggle-track {
+    @apply block w-11 h-6 rounded-full bg-surface-variant transition-colors duration-300;
+  }
+
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+  }
+
+  .toggle input:checked + .toggle-track {
+    @apply bg-deep-teal;
+  }
+
+  .toggle input:checked + .toggle-track::after {
+    transform: translateX(20px);
+  }
+
+  .toggle input:focus-visible + .toggle-track {
+    outline: 2px solid var(--color-deep-teal);
+    outline-offset: 2px;
+  }
+
+  /* Medidor de fuerza de la contrasena: cuatro segmentos que auth.js enciende
+     segun los requisitos que ya cumple el valor escrito. */
+  .strength-bar {
+    @apply h-1 flex-1 rounded-full bg-surface-variant transition-colors duration-300;
+  }
+
+  .strength-bar-on {
+    @apply bg-deep-teal;
   }
 }
 
