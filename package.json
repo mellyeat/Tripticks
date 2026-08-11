@@ -50,7 +50,6 @@
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",
-    "html2pug": "^4.0.0",
     "jest": "^30.4.2",
     "nodemon": "^3.1.14",
     "supertest": "^7.2.2",
