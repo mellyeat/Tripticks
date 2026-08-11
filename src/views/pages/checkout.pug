@@ -40,8 +40,6 @@ block contenido
             | #[span(class="material-symbols-outlined text-[18px]", aria-hidden="true") info] Estos datos provienen de tu cuenta. Para modificarlos, edita tu perfil.
         section(aria-labelledby="pago-titulo")
           h2#pago-titulo(class="font-headline-md text-headline-md text-deep-teal mb-6") Metodo de pago
-          div(class="alert-warning mb-6")
-            | #[span(class="material-symbols-outlined", aria-hidden="true") science] #[span #[strong Demostracion.] Esta pantalla simula el proceso de pago: los datos no se envian ni se almacenan en ningun lado. No escribas informacion real de tu tarjeta.]
           div(class="space-y-4")
             label(class="block cursor-pointer")
               input(type="radio", name="metodo_pago", value="tarjeta", class="sr-only", checked)
@@ -53,11 +51,11 @@ block contenido
                 div(class="space-y-4")
                   div
                     label(for="card-number", class="field-label") NUMERO DE TARJETA
-                    input#card-number(type="text", inputmode="numeric", autocomplete="off", placeholder="0000 0000 0000 0000", class="field bg-surface-container-lowest p-4")
+                    input#card-number(type="text", inputmode="numeric", autocomplete="off", maxlength="12", pattern="[0-9]{12}", placeholder="000000000000", class="field bg-surface-container-lowest p-4")
                   div(class="grid grid-cols-2 gap-4")
                     div
                       label(for="card-exp", class="field-label") FECHA EXP.
-                      input#card-exp(type="text", inputmode="numeric", autocomplete="off", placeholder="MM/AA", class="field bg-surface-container-lowest p-4")
+                      input#card-exp(type="date", autocomplete="off", class="field bg-surface-container-lowest p-4")
                     div
                       label(for="card-cvc", class="field-label") CVC
                       input#card-cvc(type="text", inputmode="numeric", autocomplete="off", placeholder="123", class="field bg-surface-container-lowest p-4")

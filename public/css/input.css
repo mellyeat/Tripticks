@@ -190,18 +190,6 @@
            text-primary hover:bg-surface-container-high;
   }
 
-  /* Proveedores externos (Google / Apple). Se dejan deshabilitados: el backend
-     todavia no expone OAuth, asi que el boton comunica la intencion sin fingir
-     que funciona. */
-  .btn-social {
-    @apply w-full inline-flex items-center justify-center gap-3 min-h-12 px-4 rounded-lg
-           bg-surface-container-lowest border border-outline-variant shadow-sm
-           font-body-md text-body-md font-semibold text-on-surface
-           transition-colors hover:bg-surface-container-low
-           disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none
-           disabled:hover:bg-surface-container-lowest;
-  }
-
   .btn-link-quiet {
     @apply font-body-sm text-body-sm text-deep-teal bg-transparent p-0
            hover:text-primary transition-colors

@@ -18,8 +18,6 @@ block contenido
         El sistema no procesa cobros: RF-08 solo registra la
         reservacion y descuenta un lugar. Esta pantalla acompana a la
         simulacion de pago del checkout, por eso nada se guarda.
-      div(class="alert-warning")
-        | #[span(class="material-symbols-outlined", aria-hidden="true") science] #[span #[strong Demostracion.] TripTicks no procesa cobros ni almacena datos de tarjetas: no existe la tabla donde guardarlos, asi que la lista siempre esta vacia y nada de lo que captures se conserva.]
       section(aria-labelledby="tarjetas-titulo")
         h2#tarjetas-titulo(class="font-headline-sm text-headline-sm text-deep-teal mb-6") Tarjetas guardadas
         div(class="grid grid-cols-1 lg:grid-cols-2 gap-gutter")
@@ -33,16 +31,14 @@ block contenido
   dialog#add-card-dialog(class="rounded-xl p-0 backdrop:bg-primary/40 backdrop:backdrop-blur-sm max-w-md w-[calc(100%-2rem)]")
     form(method="dialog", class="bg-surface-container-lowest p-6 md:p-8")
       h2(class="font-headline-sm text-headline-sm text-primary mb-3") Agregar tarjeta
-      div(class="alert-warning mb-6")
-        | #[span(class="material-symbols-outlined", aria-hidden="true") science] #[span Formulario de demostracion. No escribas datos reales de tu tarjeta.]
       div(class="space-y-4 mb-8")
         div
           label(for="nueva-card-number", class="field-label") NUMERO DE TARJETA
-          input#nueva-card-number(type="text", inputmode="numeric", autocomplete="off", placeholder="0000 0000 0000 0000", class="field")
+          input#nueva-card-number(type="text", inputmode="numeric", autocomplete="off", maxlength="12", pattern="[0-9]{12}", placeholder="000000000000", class="field")
         div(class="grid grid-cols-2 gap-4")
           div
             label(for="nueva-card-exp", class="field-label") FECHA EXP.
-            input#nueva-card-exp(type="text", inputmode="numeric", autocomplete="off", placeholder="MM/AA", class="field")
+            input#nueva-card-exp(type="date", autocomplete="off", class="field")
           div
             label(for="nueva-card-cvc", class="field-label") CVC
             input#nueva-card-cvc(type="text", inputmode="numeric", autocomplete="off", placeholder="123", class="field")
